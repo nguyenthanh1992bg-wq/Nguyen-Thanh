@@ -37,7 +37,7 @@ const palClose = () => { const d = $('#pal'); if (d) d.remove(); };
 document.addEventListener('click', e => { const d = $('#pal'); if (!d) return; const li = e.target.closest('#pal li[data-i]'); if (li) { const c = PAL.list[+li.dataset.i]; palClose(); c && c.run(); } else if (!e.target.closest('#pal>div')) palClose(); });
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#pal') ? palClose() : ACT.cmd(); return; }
-  if (e.altKey && /^[1-7]$/.test(e.key)) { e.preventDefault(); UI.tab = TAB_ORDER[+e.key - 1]; render(); return; }
+  if (e.altKey && /^[1-8]$/.test(e.key)) { e.preventDefault(); UI.tab = TAB_ORDER[+e.key - 1]; render(); return; }
   if (!$('#pal')) return;
   if (e.key === 'Escape') palClose();
   else if (e.key === 'ArrowDown') { e.preventDefault(); PAL.i = Math.min(PAL.list.length - 1, PAL.i + 1); palDraw($('#pal input').value); }

@@ -10,7 +10,7 @@ const path = require('path');
   p.on('dialog', d => d.accept());
   await p.click('[data-act=demo]');
   await p.waitForSelector('.hs .big');
-  const tabs = ['home', 'ar', 'ap', 'cash', 'plan', 'strat', 'data'];
+  const tabs = ['home', 'ar', 'ap', 'cash', 'plan', 'strat', 'rep', 'data'];
   for (const t of tabs) {
     await p.click(`#nav [data-v=${t}]`); await p.waitForTimeout(150);
     const bad = await p.$$eval('#main .card h2', h => h.filter(x => x.textContent.includes('Lỗi')).length);
