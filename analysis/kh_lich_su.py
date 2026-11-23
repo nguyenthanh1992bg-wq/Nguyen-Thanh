@@ -76,11 +76,23 @@ for it in rows:
     elif len(vals) == 1 and H['T10'].get(k, {}).get('mact', 0) > 0: base = vals[0] * 0.5; note = 'phát sinh 1/3 tháng → 50%'
     else: base = 0; note = 'không phát sinh đều'
     sh = weekly_share(k); out.append(dict(it, kind='leaf', side='chi', plan=[base * x for x in sh], note=note))
+blk = 'thu'
+for r in out:
+    if r['label'] == 'DÒNG CHI': blk = 'vp'
+    if r['label'] == 'CHI KHỐI VĂN PHÒNG': blk = 'vp'
+    if r['label'] == 'CHI NHÀ MÁY SẢN XUẤT': blk = 'nm'
+    r['block'] = blk
 leaf = [r for r in out if r['kind'] == 'leaf']
-T = {'thu': [sum(r['plan'][i] for r in leaf if r['side'] == 'thu') for i in range(5)], 'chi': [sum(r['plan'][i] for r in leaf if r['side'] == 'chi') for i in range(5)]}
-print('THU kế hoạch lịch sử:', [round(x / 1e6) for x in T['thu']], round(sum(T['thu']) / 1e6))
-print('CHI kế hoạch lịch sử:', [round(x / 1e6) for x in T['chi']], round(sum(T['chi']) / 1e6))
+sumb = lambda f: [sum(r['plan'][i] for r in leaf if f(r)) for i in range(5)]
+HT = {'DÒNG THU': sumb(lambda r: r['side'] == 'thu'), 'DÒNG CHI': sumb(lambda r: r['side'] == 'chi'), 'CHI KHỐI VĂN PHÒNG': sumb(lambda r: r['side'] == 'chi' and r['block'] == 'vp'), 'CHI NHÀ MÁY SẢN XUẤT': sumb(lambda r: r['side'] == 'chi' and r['block'] == 'nm')}
+sys_plan = {}
+for r in out:
+    if r['kind'] == 'head': sys_plan[r['label'] + '|1'] = HT.get(r['label'], [0] * 5)
+    elif r.get('plan') is not None: sys_plan[r['label'] + '|' + str(r['key'][1])] = [round(x) for x in r['plan']]
+print('THU', [round(x / 1e6) for x in HT['DÒNG THU']], round(sum(HT['DÒNG THU']) / 1e6), '| CHI', [round(x / 1e6) for x in HT['DÒNG CHI']], round(sum(HT['DÒNG CHI']) / 1e6), '| VP', round(sum(HT['CHI KHỐI VĂN PHÒNG']) / 1e6), 'NM', round(sum(HT['CHI NHÀ MÁY SẢN XUẤT']) / 1e6))
+big = sorted([(r['label'], sum(r['plan'])) for r in leaf if r['side'] == 'chi'], key=lambda x: -x[1])[:10]
+for l, v in big: print('  ', l[:48].ljust(50), round(v / 1e6))
 bal = 3403.1e6; cl = []
-for i in range(5): bal += T['thu'][i] - T['chi'][i]; cl.append(bal)
+for i in range(5): bal += HT['DÒNG THU'][i] - HT['DÒNG CHI'][i]; cl.append(round(bal))
 print('số dư cuối tuần (đầu kỳ 3.403 tr):', [round(x / 1e6) for x in cl])
-json.dump(dict(rows=[{k: v for k, v in r.items() if k != 'key'} for r in out], T=T, close=cl), open('/tmp/kh_ls.json', 'w'), ensure_ascii=False, default=float)
+json.dump(dict(sys=sys_plan, close=cl, thu_m=THU_M, ncc_m=ncc_m), open('/tmp/kh_ls.json', 'w'), ensure_ascii=False)

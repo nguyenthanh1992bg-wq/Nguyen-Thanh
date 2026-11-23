@@ -234,7 +234,7 @@ const ACT = {
   tab: t => { UI.tab = t.dataset.v; render(); window.scrollTo(0, 0); },
   sort: t => { const id = t.dataset.id, k = +t.dataset.k, s = UI.sort[id]; UI.sort[id] = { k, dir: s && s.k === k && s.dir === 'desc' ? 'asc' : 'desc' }; render(true); },
   more: t => { UI.more[t.dataset.id] = true; render(true); },
-  pickcust: (t, e) => { e.preventDefault(); UI.cust = t.dataset.k; render(true); if (UI.cust) setTimeout(() => { const h = [...document.querySelectorAll('.card h2')].find(x => x.textContent.startsWith('Chi tiết hóa đơn')); if (h) h.scrollIntoView({ behavior: 'smooth' }); }, 50); },
+  pickcust: (t, e) => { e.preventDefault(); UI.cust = t.dataset.k; if (t.dataset.goto) UI.tab = t.dataset.goto; render(true); if (UI.cust) setTimeout(() => { const h = [...document.querySelectorAll('.card h2')].find(x => x.textContent.startsWith('Chi tiết hóa đơn')); if (h) h.scrollIntoView({ behavior: 'smooth' }); }, 50); },
   scen: t => { UI.scen = t.dataset.v; render(true); }, view: t => { UI.view = t.dataset.v; render(true); },
   selpa: t => { const v = t.dataset.v; UI.sel.has(v) ? UI.sel.delete(v) : UI.sel.add(v); render(true); },
   snap: snapshot,

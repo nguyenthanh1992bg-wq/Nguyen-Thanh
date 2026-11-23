@@ -94,6 +94,9 @@ VIEWS.ktrep = () => {
   P.items.forEach((it, i) => { const n = deacc(it.label); const f = KT_LINES.find(([, re]) => re.test(n)); if (f) { rowKey[i] = [f[0]]; mapped.add(f[0]); } else if (/^chi bhxh/.test(n)) { rowKey[i] = [bhSeen++ === 0 ? 'bh_vp' : 'bh_sx']; mapped.add(rowKey[i][0]); } });
   const unmapped = allChiKeys.filter(k => !mapped.has(k));
   const cellsFor = (plan, actW, wi) => { const a = actW, p = plan[wi]; return [p, a, a == null ? '' : p - a, a == null || !p ? '' : a / p]; };
+  const src = UI.ktsrc === 'sys' && K.sys ? 'sys' : 'kt', occ = {};
+  const planW = (it, wi) => { if (src === 'kt') return it.plan[wi]; const v = K.sys[it.label + '|' + it._o]; return v ? v[wi] : 0; };
+  P.items.forEach(it => { occ[it.label] = (occ[it.label] || 0) + 1; it._o = occ[it.label]; });
   const isHead = (it, i) => /^(DÒNG THU|DÒNG CHI|CHI KHỐI|CHI NHÀ MÁY)/i.test(it.label) || ['I', 'II', 'A', 'B'].includes(it.code);
   const last = K.last ? fmtDate(K.last) : '';
   const rowsHtml = P.items.map((it, i) => {
@@ -105,10 +108,10 @@ VIEWS.ktrep = () => {
     else if (rowKey[i]) wAct = w => act(rowKey[i][0], w);
     else wAct = null;
     const bold = isHead(it, i), tot = /^(DÒNG THU|DÒNG CHI)/i.test(lab);
-    const wc = W.map((w, wi) => { const a = wAct ? wAct(wi) : null, p = it.plan[wi]; return `<td class="n">${mm(p)}</td><td class="n" style="background:${a ? '#eef7ee' : ''}">${a == null ? '' : mm(a)}</td><td class="n">${a == null ? '' : mm(p - a)}</td><td class="n">${a == null || !p ? '' : Math.round(100 * a / p) + '%'}</td>`; }).join('');
-    const mA = wAct ? W.reduce((s, w, wi) => s + wAct(wi), 0) : null, mP = it.mplan || it.plan.reduce((s, x) => s + x, 0);
+    const wc = W.map((w, wi) => { const a = wAct ? wAct(wi) : null, p = planW(it, wi); return `<td class="n">${mm(p)}</td><td class="n" style="background:${a ? '#eef7ee' : ''}">${a == null ? '' : mm(a)}</td><td class="n">${a == null ? '' : mm(p - a)}</td><td class="n">${a == null || !p ? '' : Math.round(100 * a / p) + '%'}</td>`; }).join('');
+    const mA = wAct ? W.reduce((s, w, wi) => s + wAct(wi), 0) : null, mP = src === 'sys' ? W.reduce((s, w, wi) => s + planW(it, wi), 0) : (it.mplan || it.plan.reduce((s, x) => s + x, 0));
     const mc = `<td class="n">${mm(mP)}</td><td class="n">${mA == null ? '' : mm(mA)}</td><td class="n">${mA == null ? '' : mm(mP - mA)}</td><td class="n">${mA == null || !mP ? '' : Math.round(100 * mA / mP) + '%'}</td>`;
-    if (!bold && !mP && !it.plan.some(x => x) && !(mA)) return '';
+    if (!bold && !mP && !W.some((w, wi) => planW(it, wi)) && !(mA)) return '';
     return `<tr class="${tot ? 'tot' : bold ? 'sec' : ''}"><td class="nw">${esc(it.code)}</td><td class="nw">${esc(lab)}</td>${mc}${wc}</tr>`;
   }).join('');
   const extra = unmapped.length ? `<tr class="sec"><td></td><td class="nw">Chi khác chưa phân loại theo khoản mục (từ sổ NH/quỹ)</td><td colspan="4"></td>${W.map((w, wi) => `<td></td><td class="n" style="background:#eef7ee">${mm(sumA(unmapped, wi))}</td><td></td><td></td>`).join('')}</tr>` : '';
@@ -116,7 +119,7 @@ VIEWS.ktrep = () => {
   const sub = '<th class="n">Kế hoạch</th><th class="n">Thực hiện</th><th class="n">Còn phải TH</th><th class="n">Tỷ lệ</th>';
   const head2 = sub.repeat(W.length + 1);
   const bankNow = M.S.cash0;
-  return `<div class="card" style="border-color:#1d4ed8"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div><h2 style="font-size:18px">BÁO CÁO QUẢN TRỊ DÒNG TIỀN – THÁNG ${P.month}/${P.year} (theo tuần)</h2><p class="sub">Kế hoạch: file kế toán (sheet “${esc(P.sheet)}”). Thực hiện: sổ tiền gửi NH + sổ quỹ TM + vay giải ngân trả thẳng NCC/lương, <b>đến ngày ${last}</b>. Đơn vị: triệu đồng. Số dư tiền hiện tại (sổ): <b>${fm(bankNow)}</b>.</p></div><div class="noprint"><button class="p" onclick="window.print()">In / PDF</button> <button data-act="exp_kt">Xuất Excel (mẫu KT)</button></div></div>
+  return `<div class="card" style="border-color:#1d4ed8"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div><h2 style="font-size:18px">BÁO CÁO QUẢN TRỊ DÒNG TIỀN – THÁNG ${P.month}/${P.year} (theo tuần)</h2><p class="sub">Đang xem: <b>${src === 'kt' ? 'kế hoạch của kế toán' : 'kế hoạch hệ thống lập từ lịch sử T6–T10 (không dùng số thực tế của tháng)'}</b>. Kế hoạch KT: file kế toán (sheet “${esc(P.sheet)}”). Thực hiện: sổ tiền gửi NH + sổ quỹ TM + vay giải ngân trả thẳng NCC/lương, <b>đến ngày ${last}</b>. Đơn vị: triệu đồng. Số dư tiền hiện tại (sổ): <b>${fm(bankNow)}</b>.</p></div><div class="noprint"><button class="${src === 'kt' ? 'p' : ''}" data-act="ktsrc" data-v="kt">Kế hoạch của KT</button> <button class="${src === 'sys' ? 'p' : ''}" data-act="ktsrc" data-v="sys" ${K.sys ? '' : 'disabled'}>Kế hoạch hệ thống (theo lịch sử)</button> <button onclick="window.print()">In / PDF</button> <button data-act="exp_kt">Xuất Excel</button></div></div>
   <div class="tw nomax"><table class="sticky1"><thead><tr>${head1}</tr><tr>${head2}</tr></thead><tbody>${rowsHtml}${extra}</tbody></table></div>
   <p class="note">Ô xanh = thực hiện tự động theo sổ. Khoản mục chưa ghép được vào dòng nào của mẫu được dồn vào dòng “Chi khác chưa phân loại” để tổng chi khớp sổ. Kế toán cập nhật file kế hoạch mỗi tuần → app tự lấy kế hoạch mới.</p></div>`;
 };
@@ -126,3 +129,5 @@ ACT.exp_kt = () => {
   P.items.forEach(it => aoa.push([it.code, it.label, it.mplan].concat(...W.map((w, i) => [it.plan[i], '', '']))));
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), 'BC tuần'); XLSX.writeFile(wb, 'BaoCao_DongTien_Tuan_T' + P.month + '_' + P.year + '.xlsx');
 };
+
+ACT.ktsrc = t => { UI.ktsrc = t.dataset.v; render(true); };

@@ -13,15 +13,18 @@ const LP_LABELS = [
 ];
 const mLabel = (a) => 'Tháng ' + ymd(a).m + '/' + ymd(a).y;
 
+const LEVER_OWNER = { L1: 'Phòng KD (NVKD phụ trách) + Kế toán công nợ; Phó GĐ chỉ đạo', L2: 'Trưởng phòng KD + Kế toán trưởng', L3: 'Phòng Mua hàng + Kế toán trưởng', L4: 'Phòng KD + Kho/Giao hàng + Kế toán công nợ', L5: 'Kế toán trưởng (làm việc với ngân hàng)', L6: 'Kho + Phòng KD', L7: 'Mua hàng + Sản xuất', L8: 'Giám đốc + Hành chính', L9: 'Kế toán trưởng + Giám đốc', L10: 'Kế toán trưởng + Giám đốc' };
 function pickCard(x, i) {
   const S = M.S, w = S.w;
-  const tg = x.targets.slice(0, 8).map(t => `${esc(t.name)} <span class="note">(${fm(t.amt)} tr)</span>`).join(' · ');
+  const arLev = ['L1', 'L2', 'L5'].includes(x.id);
+  const tg = x.targets.slice(0, 8).map(t => (arLev ? `<a href="#" data-act="pickcust" data-goto="ar" data-k="${esc(keyOf(t.name))}" title="Xem hóa đơn của khách">${esc(t.name)}</a>` : esc(t.name)) + ` <span class="note">(${fm(t.amt)} tr)</span>`).join(' · ');
   return `<div class="pick ${i ? 'p2' : ''}"><div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
    <div style="flex:1;min-width:300px"><h2><span class="rk">PHƯƠNG ÁN ${i + 1}</span>${esc(x.name)} <span class="note">(${x.id} · ${HG.LEVER_TYPES[x.type]})</span></h2>
     <div class="scorebar"><div>Tác động<b style="color:${scoreCol(x.sImpact)}">${x.sImpact}</b><span class="note">trọng số ${w.impact}%</span></div><div>Tốc độ ra tiền<b style="color:${scoreCol(x.sSpeed)}">${x.sSpeed}</b><span class="note">~${x.ttc} ngày · ${w.speed}%</span></div><div>Khả thi<b style="color:${scoreCol(x.sFeas)}">${x.sFeas}</b><span class="note">${x.feas}/5 · ${w.feas}%</span></div><div>Chi phí &amp; rủi ro<b style="color:${scoreCol(x.sRisk)}">${x.sRisk}</b><span class="note">rủi ro ${x.risk}/5 · ${w.risk}%</span></div></div></div>
    <div class="hs" style="flex:none"><div class="big" style="width:104px;height:104px;background:${scoreCol(x.score)}"><b style="font-size:32px">${x.score}</b><span>/ 100</span></div></div></div>
    <div class="kpis" style="margin:8px 0">${kpi('Tác động dòng tiền quy đổi', fm(x.impact) + ' tr', 'TB cải thiện số dư 60 ngày + cải thiện điểm thấp nhất')}${kpi('Cải thiện số dư thấp nhất', fm(x.dmin) + ' tr', 'Trong 13 tuần tới')}${kpi('Cải thiện số dư sau 30 / 60 ngày', fm(x.d30) + ' / ' + fm(x.d60) + ' tr', '')}${kpi('Chi phí ròng', fm(x.cost) + ' tr', x.cost && x.impact ? 'bằng ' + pct(x.cost / x.impact) + ' tác động' : 'gần như không tốn chi phí', x.cost > 0.05 * x.impact ? 'warn' : 'good')}</div>
    ${x.annual != null ? `<div class="alert info">Chi phí vốn quy năm của chiết khấu ${S.lp.discPct}% để khách trả sớm ~30 ngày ≈ <b>${f1(x.annual * 100)}%/năm</b> – ${x.annual * 100 > S.lp.loanRate ? '<b>cao hơn</b> lãi vay ngắn hạn, chỉ nên dùng khi thật sự thiếu tiền.' : 'thấp hơn lãi vay ngắn hạn, hợp lý để áp dụng.'}</div>` : ''}
+   <p><b>Bộ phận chịu trách nhiệm:</b> ${esc(LEVER_OWNER[x.id] || '–')} · <b>Thời điểm có tác động:</b> khoảng ${x.ttc} ngày · <b>Mức khả thi:</b> ${x.feas}/5 · <b>Rủi ro:</b> ${x.risk}/5 · <span class="note">Đề xuất hỗ trợ phân tích – quyết định thuộc thẩm quyền Ban giám đốc.</span></p>
    <h3>Cách làm cụ thể (SOP)</h3><ol class="steps">${x.actions.map(a => `<li>${esc(a)}</li>`).join('')}</ol>
    <h3>Đối tượng ưu tiên</h3><p>${tg || '–'}</p><p class="note"><b>KPI theo dõi:</b> ${esc(x.kpi)}</p></div>`;
 }

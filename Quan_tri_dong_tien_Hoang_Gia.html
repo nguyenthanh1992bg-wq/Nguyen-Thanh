@@ -1332,15 +1332,18 @@ const LP_LABELS = [
 ];
 const mLabel = (a) => 'Tháng ' + ymd(a).m + '/' + ymd(a).y;
 
+const LEVER_OWNER = { L1: 'Phòng KD (NVKD phụ trách) + Kế toán công nợ; Phó GĐ chỉ đạo', L2: 'Trưởng phòng KD + Kế toán trưởng', L3: 'Phòng Mua hàng + Kế toán trưởng', L4: 'Phòng KD + Kho/Giao hàng + Kế toán công nợ', L5: 'Kế toán trưởng (làm việc với ngân hàng)', L6: 'Kho + Phòng KD', L7: 'Mua hàng + Sản xuất', L8: 'Giám đốc + Hành chính', L9: 'Kế toán trưởng + Giám đốc', L10: 'Kế toán trưởng + Giám đốc' };
 function pickCard(x, i) {
   const S = M.S, w = S.w;
-  const tg = x.targets.slice(0, 8).map(t => `${esc(t.name)} <span class="note">(${fm(t.amt)} tr)</span>`).join(' · ');
+  const arLev = ['L1', 'L2', 'L5'].includes(x.id);
+  const tg = x.targets.slice(0, 8).map(t => (arLev ? `<a href="#" data-act="pickcust" data-goto="ar" data-k="${esc(keyOf(t.name))}" title="Xem hóa đơn của khách">${esc(t.name)}</a>` : esc(t.name)) + ` <span class="note">(${fm(t.amt)} tr)</span>`).join(' · ');
   return `<div class="pick ${i ? 'p2' : ''}"><div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
    <div style="flex:1;min-width:300px"><h2><span class="rk">PHƯƠNG ÁN ${i + 1}</span>${esc(x.name)} <span class="note">(${x.id} · ${HG.LEVER_TYPES[x.type]})</span></h2>
     <div class="scorebar"><div>Tác động<b style="color:${scoreCol(x.sImpact)}">${x.sImpact}</b><span class="note">trọng số ${w.impact}%</span></div><div>Tốc độ ra tiền<b style="color:${scoreCol(x.sSpeed)}">${x.sSpeed}</b><span class="note">~${x.ttc} ngày · ${w.speed}%</span></div><div>Khả thi<b style="color:${scoreCol(x.sFeas)}">${x.sFeas}</b><span class="note">${x.feas}/5 · ${w.feas}%</span></div><div>Chi phí &amp; rủi ro<b style="color:${scoreCol(x.sRisk)}">${x.sRisk}</b><span class="note">rủi ro ${x.risk}/5 · ${w.risk}%</span></div></div></div>
    <div class="hs" style="flex:none"><div class="big" style="width:104px;height:104px;background:${scoreCol(x.score)}"><b style="font-size:32px">${x.score}</b><span>/ 100</span></div></div></div>
    <div class="kpis" style="margin:8px 0">${kpi('Tác động dòng tiền quy đổi', fm(x.impact) + ' tr', 'TB cải thiện số dư 60 ngày + cải thiện điểm thấp nhất')}${kpi('Cải thiện số dư thấp nhất', fm(x.dmin) + ' tr', 'Trong 13 tuần tới')}${kpi('Cải thiện số dư sau 30 / 60 ngày', fm(x.d30) + ' / ' + fm(x.d60) + ' tr', '')}${kpi('Chi phí ròng', fm(x.cost) + ' tr', x.cost && x.impact ? 'bằng ' + pct(x.cost / x.impact) + ' tác động' : 'gần như không tốn chi phí', x.cost > 0.05 * x.impact ? 'warn' : 'good')}</div>
    ${x.annual != null ? `<div class="alert info">Chi phí vốn quy năm của chiết khấu ${S.lp.discPct}% để khách trả sớm ~30 ngày ≈ <b>${f1(x.annual * 100)}%/năm</b> – ${x.annual * 100 > S.lp.loanRate ? '<b>cao hơn</b> lãi vay ngắn hạn, chỉ nên dùng khi thật sự thiếu tiền.' : 'thấp hơn lãi vay ngắn hạn, hợp lý để áp dụng.'}</div>` : ''}
+   <p><b>Bộ phận chịu trách nhiệm:</b> ${esc(LEVER_OWNER[x.id] || '–')} · <b>Thời điểm có tác động:</b> khoảng ${x.ttc} ngày · <b>Mức khả thi:</b> ${x.feas}/5 · <b>Rủi ro:</b> ${x.risk}/5 · <span class="note">Đề xuất hỗ trợ phân tích – quyết định thuộc thẩm quyền Ban giám đốc.</span></p>
    <h3>Cách làm cụ thể (SOP)</h3><ol class="steps">${x.actions.map(a => `<li>${esc(a)}</li>`).join('')}</ol>
    <h3>Đối tượng ưu tiên</h3><p>${tg || '–'}</p><p class="note"><b>KPI theo dõi:</b> ${esc(x.kpi)}</p></div>`;
 }
@@ -1666,7 +1669,7 @@ const ACT = {
   tab: t => { UI.tab = t.dataset.v; render(); window.scrollTo(0, 0); },
   sort: t => { const id = t.dataset.id, k = +t.dataset.k, s = UI.sort[id]; UI.sort[id] = { k, dir: s && s.k === k && s.dir === 'desc' ? 'asc' : 'desc' }; render(true); },
   more: t => { UI.more[t.dataset.id] = true; render(true); },
-  pickcust: (t, e) => { e.preventDefault(); UI.cust = t.dataset.k; render(true); if (UI.cust) setTimeout(() => { const h = [...document.querySelectorAll('.card h2')].find(x => x.textContent.startsWith('Chi tiết hóa đơn')); if (h) h.scrollIntoView({ behavior: 'smooth' }); }, 50); },
+  pickcust: (t, e) => { e.preventDefault(); UI.cust = t.dataset.k; if (t.dataset.goto) UI.tab = t.dataset.goto; render(true); if (UI.cust) setTimeout(() => { const h = [...document.querySelectorAll('.card h2')].find(x => x.textContent.startsWith('Chi tiết hóa đơn')); if (h) h.scrollIntoView({ behavior: 'smooth' }); }, 50); },
   scen: t => { UI.scen = t.dataset.v; render(true); }, view: t => { UI.view = t.dataset.v; render(true); },
   selpa: t => { const v = t.dataset.v; UI.sel.has(v) ? UI.sel.delete(v) : UI.sel.add(v); render(true); },
   snap: snapshot,
@@ -2242,6 +2245,9 @@ VIEWS.ktrep = () => {
   P.items.forEach((it, i) => { const n = deacc(it.label); const f = KT_LINES.find(([, re]) => re.test(n)); if (f) { rowKey[i] = [f[0]]; mapped.add(f[0]); } else if (/^chi bhxh/.test(n)) { rowKey[i] = [bhSeen++ === 0 ? 'bh_vp' : 'bh_sx']; mapped.add(rowKey[i][0]); } });
   const unmapped = allChiKeys.filter(k => !mapped.has(k));
   const cellsFor = (plan, actW, wi) => { const a = actW, p = plan[wi]; return [p, a, a == null ? '' : p - a, a == null || !p ? '' : a / p]; };
+  const src = UI.ktsrc === 'sys' && K.sys ? 'sys' : 'kt', occ = {};
+  const planW = (it, wi) => { if (src === 'kt') return it.plan[wi]; const v = K.sys[it.label + '|' + it._o]; return v ? v[wi] : 0; };
+  P.items.forEach(it => { occ[it.label] = (occ[it.label] || 0) + 1; it._o = occ[it.label]; });
   const isHead = (it, i) => /^(DÒNG THU|DÒNG CHI|CHI KHỐI|CHI NHÀ MÁY)/i.test(it.label) || ['I', 'II', 'A', 'B'].includes(it.code);
   const last = K.last ? fmtDate(K.last) : '';
   const rowsHtml = P.items.map((it, i) => {
@@ -2253,10 +2259,10 @@ VIEWS.ktrep = () => {
     else if (rowKey[i]) wAct = w => act(rowKey[i][0], w);
     else wAct = null;
     const bold = isHead(it, i), tot = /^(DÒNG THU|DÒNG CHI)/i.test(lab);
-    const wc = W.map((w, wi) => { const a = wAct ? wAct(wi) : null, p = it.plan[wi]; return `<td class="n">${mm(p)}</td><td class="n" style="background:${a ? '#eef7ee' : ''}">${a == null ? '' : mm(a)}</td><td class="n">${a == null ? '' : mm(p - a)}</td><td class="n">${a == null || !p ? '' : Math.round(100 * a / p) + '%'}</td>`; }).join('');
-    const mA = wAct ? W.reduce((s, w, wi) => s + wAct(wi), 0) : null, mP = it.mplan || it.plan.reduce((s, x) => s + x, 0);
+    const wc = W.map((w, wi) => { const a = wAct ? wAct(wi) : null, p = planW(it, wi); return `<td class="n">${mm(p)}</td><td class="n" style="background:${a ? '#eef7ee' : ''}">${a == null ? '' : mm(a)}</td><td class="n">${a == null ? '' : mm(p - a)}</td><td class="n">${a == null || !p ? '' : Math.round(100 * a / p) + '%'}</td>`; }).join('');
+    const mA = wAct ? W.reduce((s, w, wi) => s + wAct(wi), 0) : null, mP = src === 'sys' ? W.reduce((s, w, wi) => s + planW(it, wi), 0) : (it.mplan || it.plan.reduce((s, x) => s + x, 0));
     const mc = `<td class="n">${mm(mP)}</td><td class="n">${mA == null ? '' : mm(mA)}</td><td class="n">${mA == null ? '' : mm(mP - mA)}</td><td class="n">${mA == null || !mP ? '' : Math.round(100 * mA / mP) + '%'}</td>`;
-    if (!bold && !mP && !it.plan.some(x => x) && !(mA)) return '';
+    if (!bold && !mP && !W.some((w, wi) => planW(it, wi)) && !(mA)) return '';
     return `<tr class="${tot ? 'tot' : bold ? 'sec' : ''}"><td class="nw">${esc(it.code)}</td><td class="nw">${esc(lab)}</td>${mc}${wc}</tr>`;
   }).join('');
   const extra = unmapped.length ? `<tr class="sec"><td></td><td class="nw">Chi khác chưa phân loại theo khoản mục (từ sổ NH/quỹ)</td><td colspan="4"></td>${W.map((w, wi) => `<td></td><td class="n" style="background:#eef7ee">${mm(sumA(unmapped, wi))}</td><td></td><td></td>`).join('')}</tr>` : '';
@@ -2264,7 +2270,7 @@ VIEWS.ktrep = () => {
   const sub = '<th class="n">Kế hoạch</th><th class="n">Thực hiện</th><th class="n">Còn phải TH</th><th class="n">Tỷ lệ</th>';
   const head2 = sub.repeat(W.length + 1);
   const bankNow = M.S.cash0;
-  return `<div class="card" style="border-color:#1d4ed8"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div><h2 style="font-size:18px">BÁO CÁO QUẢN TRỊ DÒNG TIỀN – THÁNG ${P.month}/${P.year} (theo tuần)</h2><p class="sub">Kế hoạch: file kế toán (sheet “${esc(P.sheet)}”). Thực hiện: sổ tiền gửi NH + sổ quỹ TM + vay giải ngân trả thẳng NCC/lương, <b>đến ngày ${last}</b>. Đơn vị: triệu đồng. Số dư tiền hiện tại (sổ): <b>${fm(bankNow)}</b>.</p></div><div class="noprint"><button class="p" onclick="window.print()">In / PDF</button> <button data-act="exp_kt">Xuất Excel (mẫu KT)</button></div></div>
+  return `<div class="card" style="border-color:#1d4ed8"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div><h2 style="font-size:18px">BÁO CÁO QUẢN TRỊ DÒNG TIỀN – THÁNG ${P.month}/${P.year} (theo tuần)</h2><p class="sub">Đang xem: <b>${src === 'kt' ? 'kế hoạch của kế toán' : 'kế hoạch hệ thống lập từ lịch sử T6–T10 (không dùng số thực tế của tháng)'}</b>. Kế hoạch KT: file kế toán (sheet “${esc(P.sheet)}”). Thực hiện: sổ tiền gửi NH + sổ quỹ TM + vay giải ngân trả thẳng NCC/lương, <b>đến ngày ${last}</b>. Đơn vị: triệu đồng. Số dư tiền hiện tại (sổ): <b>${fm(bankNow)}</b>.</p></div><div class="noprint"><button class="${src === 'kt' ? 'p' : ''}" data-act="ktsrc" data-v="kt">Kế hoạch của KT</button> <button class="${src === 'sys' ? 'p' : ''}" data-act="ktsrc" data-v="sys" ${K.sys ? '' : 'disabled'}>Kế hoạch hệ thống (theo lịch sử)</button> <button onclick="window.print()">In / PDF</button> <button data-act="exp_kt">Xuất Excel</button></div></div>
   <div class="tw nomax"><table class="sticky1"><thead><tr>${head1}</tr><tr>${head2}</tr></thead><tbody>${rowsHtml}${extra}</tbody></table></div>
   <p class="note">Ô xanh = thực hiện tự động theo sổ. Khoản mục chưa ghép được vào dòng nào của mẫu được dồn vào dòng “Chi khác chưa phân loại” để tổng chi khớp sổ. Kế toán cập nhật file kế hoạch mỗi tuần → app tự lấy kế hoạch mới.</p></div>`;
 };
@@ -2273,6 +2279,51 @@ ACT.exp_kt = () => {
   const aoa = [['BÁO CÁO QUẢN TRỊ DÒNG TIỀN THÁNG ' + P.month + '/' + P.year], ['Thực hiện đến ngày ' + (K.last ? fmtDate(K.last) : '')], [], ['Stt', 'Nội dung', 'FC tháng: Kế hoạch', 'Thực hiện', 'Còn phải TH'].concat(...W.map(w => [w.label + ' – KH', 'TH', 'Còn']))];
   P.items.forEach(it => aoa.push([it.code, it.label, it.mplan].concat(...W.map((w, i) => [it.plan[i], '', '']))));
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), 'BC tuần'); XLSX.writeFile(wb, 'BaoCao_DongTien_Tuan_T' + P.month + '_' + P.year + '.xlsx');
+};
+
+ACT.ktsrc = t => { UI.ktsrc = t.dataset.v; render(true); };
+
+/* =====================================================================
+ * APP – ĐÁNH GIÁ KẾ HOẠCH ĐỊNH KỲ: so sánh kế hoạch KT, kế hoạch hệ thống và thực hiện theo từng tuần;
+ * tự lưu bản đánh giá mỗi lần dữ liệu cập nhật; gợi ý tỷ lệ hiệu chỉnh cho tháng sau.
+ * ===================================================================== */
+const HIST_RATIO = { labels: ['T06', 'T07', 'T08', 'T09', 'T10'], kh: [14005, 15064, 16618, 15338, 15550], tt: [15695, 15870, 14788, 13610, 14275] };   /* triệu đồng – file KH/TH thu T6–T10 */
+function ktEvalCalc(K) {
+  if (!K) return null;
+  const P = K.plan, A = K.act, W = P.weeks, items = P.items, occ = {};
+  items.forEach(it => { occ[it.label] = (occ[it.label] || 0) + 1; it._o = occ[it.label]; });
+  const find = re => items.find(it => re.test(deacc(it.label)));
+  const rowThuKH = find(/^thu cong no khach hang/), rowNcc = find(/^chi tien thanh toan ncc/), rowThu = find(/^dong thu/), rowChi = find(/^dong chi/);
+  const thuK = ['thu_kh', 'thu_vay', 'thu_khac'], act = (k, w) => (A[k] ? A[k][w] : 0);
+  const aThuKH = w => act('thu_kh', w), aNcc = w => act('ncc', w), aThu = w => thuK.reduce((s, k) => s + act(k, w), 0), aChi = w => Object.keys(A).filter(k => !thuK.includes(k)).reduce((s, k) => s + act(k, w), 0);
+  const lines = [['Thu công nợ khách hàng', rowThuKH, aThuKH, 3], ['Chi thanh toán NCC', rowNcc, aNcc, 3], ['Tổng thu', rowThu, aThu, 2], ['Tổng chi', rowChi, aChi, 2]];
+  const sysOf = (it, w) => (K.sys && it && K.sys[it.label + '|' + it._o]) ? K.sys[it.label + '|' + it._o][w] : null;
+  const acc = (a, p) => p == null ? null : Math.max(0, 1 - Math.abs(a - p) / Math.max(a, p, 1));
+  const res = []; let sk = 0, ss = 0, sw = 0;
+  W.forEach((w, wi) => {
+    if (!(K.last >= dn(P.year, P.month, w.d2))) return;               /* chỉ đánh giá tuần đã kết thúc */
+    lines.forEach(([name, it, f, wt]) => { if (!it) return; const a = f(wi), pk = it.plan[wi], ps = sysOf(it, wi); const ak = acc(a, pk), as = acc(a, ps); res.push({ week: w.label, name, a, pk, ps, ak, as, wt }); sk += (ak || 0) * wt; if (as != null) ss += as * wt; sw += wt; });
+  });
+  return { rows: res, scoreKT: sw ? Math.round(100 * sk / sw) : null, scoreSys: sw && K.sys ? Math.round(100 * ss / sw) : null, weeks: new Set(res.map(r => r.week)).size };
+}
+function ktEvalSave() {   /* lưu bản đánh giá mỗi khi dữ liệu mới (theo ngày cập nhật) */
+  if (!M.kt) return; const e = ktEvalCalc(M.kt); if (!e || e.scoreKT == null) return;
+  M.evals = M.evals || []; const key = M.kt.plan.year + '-' + M.kt.plan.month + '@' + M.kt.last;
+  if (!M.evals.some(x => x.key === key)) { M.evals.push({ key, month: M.kt.plan.month + '/' + M.kt.plan.year, last: M.kt.last, weeks: e.weeks, scoreKT: e.scoreKT, scoreSys: e.scoreSys }); save(); }
+}
+NAVG[2][1].push(['evalkh', '📏', 'Đánh giá kế hoạch định kỳ']); TITLE.evalkh = 'Đánh giá chất lượng kế hoạch dòng tiền (định kỳ)'; TAB_ORDER.push('evalkh');
+VIEWS.evalkh = () => {
+  const K = M.kt, hr = HIST_RATIO; if (K) ktEvalSave();
+  const e = ktEvalCalc(K), rat = hr.tt.map((t, i) => t / hr.kh[i]), r3 = (hr.tt.slice(2).reduce((s, x) => s + x, 0) / hr.kh.slice(2).reduce((s, x) => s + x, 0));
+  const cur = K && K.plan.items.find(it => /^thu cong no khach hang/.test(deacc(it.label)));
+  const best = e && e.scoreSys != null ? (e.scoreSys >= e.scoreKT ? 'Kế hoạch hệ thống' : 'Kế hoạch của KT') : null;
+  const scoreBadge = s => s == null ? '–' : `<b style="font-size:22px;color:${scoreCol(s)}">${s}</b>/100`;
+  return `<div class="card" style="border-color:#1d4ed8"><h2>Điểm chất lượng kế hoạch tháng này</h2><p class="sub">Điểm độ chính xác = 100 × (1 − |thực hiện − kế hoạch| / max(thực hiện, kế hoạch)), trung bình có trọng số cho thu khách, chi NCC (trọng số 3) và tổng thu, tổng chi (trọng số 2); chỉ tính tuần đã kết thúc. Mỗi lần dữ liệu được cập nhật, app tự đánh giá lại và lưu vết.</p>
+   ${e ? `<div class="kpis"><div class="kpi"><div class="l">Kế hoạch của kế toán</div><div class="v">${scoreBadge(e.scoreKT)}</div><div class="s">${e.weeks} tuần đã kết thúc</div></div><div class="kpi good"><div class="l">Kế hoạch hệ thống (lịch sử)</div><div class="v">${scoreBadge(e.scoreSys)}</div><div class="s">${best ? 'Sát thực tế hơn: ' + best : ''}</div></div><div class="kpi"><div class="l">Thực hiện đến ngày</div><div class="v">${K.last ? fmtDate(K.last) : '–'}</div><div class="s">tuần chưa kết thúc chưa tính</div></div></div>
+   ${tbl('evk', [{ h: 'Tuần', f: r => esc(r.week) }, { h: 'Khoản mục', f: r => esc(r.name) }, { h: 'Thực hiện (tr)', c: 'n', f: r => fm(r.a) }, { h: 'KH của KT (tr)', c: 'n', f: r => fm(r.pk) }, { h: 'Độ chính xác KT', c: 'n', f: r => pct(r.ak), cls: r => r.ak < 0.6 ? 'cellbad' : '' }, { h: 'KH hệ thống (tr)', c: 'n', f: r => r.ps == null ? '' : fm(r.ps) }, { h: 'Độ chính xác HT', c: 'n', f: r => r.as == null ? '' : pct(r.as), cls: r => r.as != null && r.as < 0.6 ? 'cellbad' : '' }], e.rows, { nomax: 1 })}` : '<div class="alert info">Chưa có tuần nào kết thúc kèm kế hoạch để đánh giá. Hãy nạp file kế hoạch của kế toán và sổ ngân hàng/quỹ.</div>'}</div>
+  <div class="grid2"><div class="card"><h2>Tỷ lệ thực thu / kế hoạch thu (lịch sử → hiệu chỉnh tháng sau)</h2>${tbl('evr', [{ h: 'Tháng', f: (r, i) => r[0] }, { h: 'Kế hoạch (tr)', c: 'n', f: r => ff(r[1]) }, { h: 'Thực thu (tr)', c: 'n', f: r => ff(r[2]) }, { h: 'Thực/KH', c: 'n', f: r => `<b>${pct(r[3])}</b>`, cls: r => r[3] < 0.95 ? 'cellwarn' : '' }], hr.labels.map((l, i) => [l, hr.kh[i], hr.tt[i], rat[i]]), { nomax: 1 })}
+   <div class="alert info">Tỷ lệ 3 tháng gần nhất = <b>${pct(r3)}</b> → khi kế toán lập kế hoạch thu tháng sau, nên nhân kế hoạch theo hạn thanh toán với hệ số này (ví dụ KH 17,5 tỷ → ${(17.5 * r3).toFixed(1)} tỷ). Cuối mỗi tháng thêm số liệu mới vào bảng để hệ số được cập nhật.</div></div>
+  <div class="card"><h2>Lịch sử các lần đánh giá</h2>${(M.evals || []).length ? tbl('evh', [{ h: 'Tháng', f: x => x.month }, { h: 'Đến ngày', f: x => fmtDate(x.last) }, { h: 'Số tuần', c: 'n', f: x => x.weeks }, { h: 'Điểm KT', c: 'n', f: x => x.scoreKT }, { h: 'Điểm hệ thống', c: 'n', f: x => x.scoreSys == null ? '' : x.scoreSys }], M.evals.slice().reverse(), { nomax: 1 }) : '<p class="note">Chưa có bản đánh giá nào được lưu.</p>'}<p class="note">Lịch đánh giá: tự động mỗi lần app đọc dữ liệu mới (khuyến nghị cập nhật hằng ngày); chốt điểm tháng vào ngày làm việc cuối tháng.</p></div></div>`;
 };
 
 </script>
