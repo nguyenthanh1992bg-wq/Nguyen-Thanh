@@ -25,10 +25,10 @@ def widths(ws, ws_w):
 # ===================================================================== SHEET: Dòng tiền ngày
 wd = wb.active; wd.title = 'Dòng tiền ngày 22-30.11'
 wd['A1'] = 'DÒNG TIỀN NGÀY 22–30/11/2026 (dự báo) – đổi ô vàng để chạy lại'; wd['A1'].font = Font(bold=True, size=14, color=NAVY)
-put(wd, 3, 1, 'Hệ số thu cuối tháng so với TB 5 tháng (T6–T10)', border=False); put(wd, 3, 5, 0.9, '0%', BLUE, inp_fill)
+put(wd, 3, 1, 'Hệ số thu cuối tháng so với TB 5 tháng (T6–T10)', border=False); put(wd, 3, 5, 1.0, '0%', BLUE, inp_fill)
 put(wd, 4, 1, 'Ngưỡng tiền tối thiểu giữ lại (VND)', border=False); put(wd, 4, 5, 150000000, NUM, BLUE, inp_fill)
 put(wd, 5, 1, 'Số dư đầu ngày 22/11 = sổ NH đến 21/11 + quỹ TM đến 13/11', border=False); put(wd, 5, 5, BANK_NOW + CASH_NOW, NUM, BLUE, inp_fill)
-put(wd, 6, 1, 'Hệ số: 65% = thận trọng · 90% = cơ bản · 100% = lạc quan. Chi NCC = tiền còn dư sau khi giữ đủ gốc/lãi 3 ngày tới và ngưỡng tối thiểu.', border=False, font=GREY)
+put(wd, 6, 1, 'Hệ số tính từ lịch sử T6–T10: thu 6 ngày làm việc cuối tháng dao động 8,13–9,03 tỷ so với TB 8,67 tỷ → 94% = thấp nhất, 100% = cơ bản, 104% = cao nhất. Chi NCC = tiền còn dư sau khi giữ đủ gốc/lãi 3 ngày tới và ngưỡng tối thiểu.', border=False, font=GREY)
 hdr(wd, 8, 1, ['Ngày', 'Thứ', 'Tuần', 'Ngày làm việc (1/0)', 'Thu KH – cơ sở (TB 5 tháng)', 'Thu KH dự báo', 'Gốc vay NH', 'Lãi vay', 'Chi phí vận hành & khác', 'Chi bắt buộc 3 ngày tới', 'Chi NCC (khả năng)', 'Số dư đầu ngày', 'Số dư cuối ngày'], h=44)
 R0 = 9; WD = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
 for i, d in enumerate(days):
@@ -90,7 +90,7 @@ for w in range(5):
 put(ws, rr, 18, '', fill=tot_fill); put(ws, rr, 19, '', fill=tot_fill); put(ws, rr, 20, '=E7', NUM, B, tot_fill); put(ws, rr, 21, 'Số dư 01/11: NH 2.710.474.258 (bảng kê số dư NH) + quỹ TM 692.613.645 (sổ quỹ).', wrap=True, font=GREY)
 ws.cell(8, 2, 'I. DÒNG THU').font = B
 line(9, 'thu_tot', 'Tổng thu', bold=True, fill=tot_fill, actual=[0]*5, forecast=None)
-line(10, 'thu_kh', '  Thu công nợ khách hàng', 'Thực hiện: sổ NH + quỹ. Dự báo: TB 5 tháng của các ngày làm việc cuối tháng × hệ số 90% (T6–T10: 8,1–9,0 tỷ/6 ngày cuối).', actual=A['thu_kh'], forecast=fc('F'))
+line(10, 'thu_kh', '  Thu công nợ khách hàng', 'Thực hiện: sổ NH + quỹ. Dự báo: TB 5 tháng của các ngày làm việc cuối tháng × hệ số 100% (T6–T10: 8,1–9,0 tỷ/6 ngày cuối; không có xu hướng giảm).', actual=A['thu_kh'], forecast=fc('F'))
 line(11, 'vay', '  Vay giải ngân trả thẳng NCC/lương (VCB…)', 'Không qua sổ NH: 10/11 VCB 855,3 tr trả lương. Chưa dự báo giải ngân mới (xem Phương án 1).', actual=A['vay_gn'])
 line(12, 'thu_khac', '  Thu khác (hoàn ứng, thu khác)', '', actual=A['thu_khac'])
 ws.cell(13, 2, 'II. DÒNG CHI').font = B
@@ -171,7 +171,7 @@ for i in opn:
     c['maxover'] = max(c['maxover'], o); c['over30'] += i['rem'] if o > 30 else 0; c['over60'] += i['rem'] if o > 60 else 0
     c['nv'] = (f['kh'].get(i['cust'], {}) or {}).get('nv', '')
 det = f['detail']; totd = sum(det.values()) or 1
-fc_total = sum(base_by_day.values()) * 0.9
+fc_total = sum(base_by_day.values()) * 1.0
 rows = sorted(cust.items(), key=lambda x: -(det.get(x[0], 0)))
 hdr(wk_, 4, 1, ['#', 'Khách hàng', 'NVKD', 'Dư nợ mở (VND)', 'Số HĐ', 'Quá hạn >30 ngày', 'Quá hạn >60 ngày', 'Trễ tối đa (ngày)', 'Dự kiến trả 22–30/11 (VND)', 'Hành động'], h=40)
 for i, (nm, c) in enumerate(rows[:40]):
@@ -257,7 +257,7 @@ for i in range(6): put(wr, rr, 2 + i, rank_mean[i], NUM, B)
 put(wr, rr, 8, sum(rank_mean), NUM, B); rr += 2
 wr.cell(rr, 1, 'B. Kiểm định mô hình (backtest 9 ngày cuối tháng, T6–T10)').font = Font(bold=True, color=NAVY); rr += 1
 for t in ['Mô hình theo từng hóa đơn (tuổi nợ → xác suất trả) chỉ dự báo 2,3–3,6 lần THẤP hơn thực tế ở 9 ngày cuối tháng: khách hàng trả theo CHU KỲ cuối tháng (chốt công nợ/thanh toán tập trung), không rải đều theo hạn hóa đơn.',
-          'Vì vậy kế hoạch dùng quy luật thực nghiệm (TB 6 ngày làm việc cuối tháng của 5 tháng, nhân hệ số 90%) cho tổng thu; mô hình hóa đơn chỉ dùng để phân bổ tiền cho từng khách và xếp hạng thu nợ.',
+          'Vì vậy kế hoạch dùng quy luật thực nghiệm (TB 6 ngày làm việc cuối tháng của 5 tháng, nhân hệ số 100%) cho tổng thu; mô hình hóa đơn chỉ dùng để phân bổ tiền cho từng khách và xếp hạng thu nợ.',
           'Thu 01–21/11 đúng quy luật (4,6 tỷ ≈ mức cùng kỳ T10: 4,1–4,7 tỷ) → chưa có dấu hiệu xấu đi, nhưng 100% kế hoạch phụ thuộc 2 ngày 27/11 và 30/11.']:
     put(wr, rr, 1, '• ' + t, wrap=True, border=False); wr.merge_cells(start_row=rr, start_column=1, end_row=rr, end_column=10); wr.row_dimensions[rr].height = 32; rr += 1
 rr += 1; wr.cell(rr, 1, 'C. Chênh lệch giữa báo cáo kế toán và sổ sách (cần kế toán trưởng giải trình)').font = Font(bold=True, color=NAVY); rr += 1
@@ -301,7 +301,7 @@ wg = wb.create_sheet('Giả định & nguồn')
 wg['A1'] = 'GIẢ ĐỊNH & NGUỒN DỮ LIỆU'; wg['A1'].font = Font(bold=True, size=14, color=NAVY)
 txt = ['NGUỒN: sổ tiền gửi NH 01/10–21/11 (2 file), bảng kê số dư NH, sổ quỹ TM (đến 13/11), chi tiết 131 theo hóa đơn & theo khách (01/04–12/11), chi tiết 331 theo NCC + hạn thanh toán NCC (12/11), theo dõi vay NH (13/11), hợp đồng bán ra 2026, danh sách khách hàng, báo cáo dòng tiền T6–T10 của phòng KT.',
        'Thực hiện 01–21/11 lấy từ sổ NH (loại bỏ chuyển nội bộ giữa các TK) + sổ quỹ đến 13/11 + giải ngân vay trả thẳng NCC/lương. Sổ quỹ 14–21/11 chưa có → giả định số dư TM không đổi 699,9 tr.',
-       'Thu KH 23–30/11 = TB các ngày làm việc cuối tháng T6–T10 × hệ số (mặc định 90%). Nov 28–29 (T7, CN) không thu.',
+       'Thu KH 23–30/11 = TB các ngày làm việc cuối tháng T6–T10 × hệ số (mặc định 100%). Nov 28–29 (T7, CN) không thu.',
        'Chi NCC 22–30/11 = phần tiền còn dư sau khi giữ đủ gốc/lãi vay 3 ngày tới, chi phí vận hành và ngưỡng 150 tr (không phải nhu cầu).',
        'Vay: giả định KHÔNG đảo nợ, trả đúng lịch (BIDV 24/11, 25/11, 30/11). Không có giải ngân vay mới 22–30/11 (xem Phương án 2).',
        'Chi phí vận hành & khác chạy theo T10 (1,26 tỷ/tháng). Chưa tính GTGT tồn đọng 1,44 tỷ và các khoản đầu tư ngoài kế hoạch.',

@@ -78,7 +78,7 @@ for i, (m, a) in enumerate(zip(['T6', 'T7', 'T8', 'T9', 'T10'], last6)):
 put(w2, 19, 1, 'Trung bình', bold=True); put(w2, 19, 4, '=AVERAGE(D14:D18)', '0.0%', True)
 put(w2, 21, 1, 'KT T11 dự kiến thu KH trong tuần 4–5 (23–30/11)'); put(w2, 21, 2, (KT['thu_kh']['plan'][3] + KT['thu_kh']['plan'][4]) / 1e6, NUM, True, bad)
 put(w2, 22, 1, 'Mức cao nhất 6 ngày cuối từng đạt (T10)'); put(w2, 22, 2, max(last6), NUM)
-put(w2, 23, 1, 'Bản phân tích (hệ số 90%)'); put(w2, 23, 2, 7799, NUM, fill=yel)
+put(w2, 23, 1, 'Bản phân tích (hệ số 100%)'); put(w2, 23, 2, 8665, NUM, fill=yel)
 w2.column_dimensions['A'].width = 52
 for c in 'BCDE': w2.column_dimensions[c].width = 28
 # ---- chấm điểm

@@ -57,7 +57,7 @@ need_over = sum(o['rem'] for o in aps if o['due'] < dt.date(2026, 11, 23)); need
 days = [dt.date(2026, 11, 22) + dt.timedelta(days=k) for k in range(9)]
 MAND = {dt.date(2026,11,24): (933480211, 0), dt.date(2026,11,25): (73400000 + 87000000 + 11000000, 180000000), dt.date(2026,11,30): (300805596, 0)}
 CP_DAILY = 1.258e9 / 21 * 1.0     # chi phí vận hành & khác: chạy theo tháng 10 (1,26 tỷ/21 ngày làm việc)
-def simulate(factor=0.9, buffer=150e6, mod=None):
+def simulate(factor=1.0, buffer=150e6, mod=None):
     mod = mod or {}
     bal = BANK_NOW + CASH_NOW; rows = []; minbal = (1e18, None)
     for i, d in enumerate(days):
@@ -94,7 +94,7 @@ add('P2', 'Giải ngân vay VCB/Vietinbank trả thẳng nhà cung cấp đến 
     ['Chọn 6–10 NCC có hóa đơn quá hạn/đến hạn lớn nhất (sheet “Chi NCC ưu tiên”) để giải ngân trả thẳng (khế ước theo từng NCC như thực tế đang làm).', 'Ưu tiên VCB (lãi ~4%/năm, 179 ngày); dùng Vietinbank nếu VCB hết hạn mức.', 'Chỉ dùng cho NCC cần giữ quan hệ/giá; không dùng để trả chi phí lặp lại.', 'Theo dõi tổng dư nợ/vốn lưu động: không vượt trần nội bộ.'],
     'Số NCC quá hạn giảm; chi phí tài chính < 3% số giải ngân.', 'KT trưởng')
 add('P3', 'Chiến dịch “chốt tiền trước 27/11” với 12 khách lớn thường trả cuối tháng', '5 tháng liên tiếp 8,1–9,0 tỷ (59–69% tiền thu cả tháng) dồn vào 6 ngày làm việc cuối tháng, riêng ngày cuối ~3,6 tỷ; kéo sớm 25% khoản ngày cuối về 24–26/11 giúp qua mốc trả gốc 24/11.',
-    dict(thu={dt.date(2026,11,24): 0.25 * base_by_day[d30] * 0.9 * 0.5, dt.date(2026,11,25): 0.25 * base_by_day[d30] * 0.9 * 0.5, d30: -0.25 * base_by_day[d30] * 0.9}), 0, 3, 3, 1,
+    dict(thu={dt.date(2026,11,24): 0.25 * base_by_day[d30] * 1.0 * 0.5, dt.date(2026,11,25): 0.25 * base_by_day[d30] * 1.0 * 0.5, d30: -0.25 * base_by_day[d30] * 1.0}), 0, 3, 3, 1,
     ['Hôm nay: lấy danh sách khách (sheet “Thu KH”) → mỗi NVKD gọi chốt NGÀY chuyển tiền bằng email/Zalo, mục tiêu 24–26/11.', 'Phó GĐ gọi trực tiếp các khách ≥ 300 tr (Samju, Marukoh, Bigfun, Toyo Solar…).', 'Gửi sẵn đối chiếu công nợ + hóa đơn VAT để khách không viện lý do thiếu chứng từ.', 'Báo cáo tiền về lúc 11h và 16h mỗi ngày 24–30/11.'],
     'Tiền khách về 24–26/11 ≥ 1,0 tỷ.', 'Phó GĐ + Trưởng phòng KD')
 add('P4', 'Chiết khấu thanh toán sớm 1% cho khách lớn không quá hạn', 'Khách tốt ít thanh toán trước hạn; chiết khấu 1% cho trả trong 3 ngày kéo thêm ~1,0 tỷ.',
@@ -103,7 +103,7 @@ add('P4', 'Chiết khấu thanh toán sớm 1% cho khách lớn không quá hạ
 for lv in levers:
     if lv['id'] == 'P2': lv['impact_bal'] = 2.0e9       # NCC được trả thẳng bằng vay -> tiền giữ lại
     elif lv['id'] == 'P1': lv['impact_bal'] = 1234285807
-    elif lv['id'] == 'P3': lv['impact_bal'] = 0.25 * base_by_day[d30] * 0.9
+    elif lv['id'] == 'P3': lv['impact_bal'] = 0.25 * base_by_day[d30] * 1.0
     elif lv['id'] == 'P4': lv['impact_bal'] = 1.0e9 * 0.99 * 0.6
 # chấm điểm
 W = dict(impact=40, speed=20, feas=25, risk=15)
@@ -125,7 +125,7 @@ if __name__ == '__main__':
     print('  tổng thu', round(thu/1e6), 'chi', round(chi/1e6), '=> số dư cuối 21/11 theo tổng hợp', round((OPEN_BANK+OPEN_CASH+thu-chi)/1e6), 'so với sổ', round((BANK_NOW+CASH_NOW)/1e6))
     print('hạng ngày cuối tháng (TB):', [round(x/1e6) for x in rank_mean], '→ Nov', {d.strftime('%d/%m'): round(v/1e6) for d, v in base_by_day.items()})
     print('NCC nhu cầu: quá hạn', round(need_over/1e9, 2), 'đến hạn 23–30/11', round(need_nov/1e9, 2), 'T12+', round(need_dec/1e9, 2), 'chưa khớp thanh toán', round(unm/1e6))
-    for f in (0.65, 0.9, 1.0):
+    for f in (0.94, 1.0, 1.04):
         r, _ = simulate(f); s = summarize(r); print(f'KB hệ số {f}: min {s["min"]/1e6:.0f} cuối {s["end"]/1e6:.0f} NCC trả {s["ncc"]/1e6:.0f}', [round(x['close']/1e6) for x in r])
     r, _ = simulate(0.9)
     for x in r: print(x['d'], round(x['open']/1e6), '+', round(x['thu']/1e6), 'gốc', round(x['g']/1e6), 'lãi', round(x['l']/1e6), 'cp', round(x['cp']/1e6), 'NCC', round(x['ncc']/1e6), '=', round(x['close']/1e6))
