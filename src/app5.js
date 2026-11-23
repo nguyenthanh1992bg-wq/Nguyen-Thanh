@@ -27,7 +27,7 @@ async function syncFolder(force) {
     for (const x of items) {
       let wb; try { wb = XLSX.read(await x.f.arrayBuffer(), { type: 'array' }); } catch (e) { log.push(x.name + ': không đọc được'); continue; }
       const rd = typeof REAL !== 'undefined' ? REAL.detect(wb) : null;
-      if (rd) { parts[rd.kind] = Object.assign({ wb, name: x.name }, rd); log.push(x.name + ' → ' + rd.kind); seen[x.name] = x.key; continue; }
+      if (rd) { const pp = Object.assign({ wb, name: x.name }, rd); parts[rd.kind] = pp; if (rd.kind === 'bankLed' || rd.kind === 'cashBook') (parts[rd.kind + 's'] || (parts[rd.kind + 's'] = [])).push(pp); log.push(x.name + ' → ' + rd.kind); seen[x.name] = x.key; continue; }
       for (const sn of wb.SheetNames) {
         const rows = sheetRows(wb.Sheets[sn]); if (rows.length < 2) continue;
         const t = classify(x.name, sn, rows);

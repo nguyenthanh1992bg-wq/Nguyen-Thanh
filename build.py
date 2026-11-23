@@ -3,7 +3,7 @@
 import pathlib
 r = pathlib.Path(__file__).parent
 rd = lambda p: (r / p).read_text(encoding='utf-8')
-app = '\n'.join(rd(f'src/{f}') for f in ['engine.js', 'demo.js', 'app1.js', 'app2.js', 'app3.js', 'app4.js', 'app5.js', 'app6.js', 'app7.js', 'app8.js', 'app9.js', 'app10.js'])
+app = '\n'.join(rd(f'src/{f}') for f in ['engine.js', 'demo.js', 'app1.js', 'app2.js', 'app3.js', 'app4.js', 'app5.js', 'app6.js', 'app7.js', 'app8.js', 'app9.js', 'app10.js', 'app11.js'])
 app = app.replace('</script', '<\\/script')
 html = rd('src/index.html').replace('/*STYLE*/', rd('src/style.css')).replace('/*XLSX*/', rd('vendor/xlsx.full.min.js').replace('</script', '<\\/script')).replace('/*APP*/', app)
 out = r / 'Quan_tri_dong_tien_Hoang_Gia.html'

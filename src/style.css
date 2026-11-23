@@ -149,3 +149,5 @@ body.dark .rb:hover{background:#26324a}body.dark .alert{background:#2a2414;color
 body.dark .scorebar div{background:#1c2535}body.dark svg text{fill:#93a0b5}body.dark #aipanel .aim{background:#0f1521}
 @media print{body{overflow:visible}#app{display:block;height:auto}#side,#top,#status{display:none!important}#main{overflow:visible}}
 @media (max-width:900px){#side{width:60px}.bt,#side nav .ng,#side nav button span:not(.ic),.sb span{display:none}#cmdk{min-width:0}}
+
+#syncst2{max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

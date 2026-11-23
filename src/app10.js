@@ -11,6 +11,7 @@ const REAL = {
   /** nhận dạng loại file theo tiêu đề dòng 1 (và sheet) */
   detect(wb) {
     const names = wb.SheetNames.map(deacc);
+    const ktI = names.findIndex(n => /^dong tien t\d/.test(n)); if (ktI >= 0) return { kind: 'ktPlan', sheet: wb.SheetNames[ktI] };
     if (names.includes('danh sach tai khoan') && names.includes('theo doi tra no')) return { kind: 'loans', sheet: wb.SheetNames[names.indexOf('danh sach tai khoan')] };
     const sh = wb.SheetNames[0], rows = REAL.rows(wb.Sheets[sh]), t = REAL.title(rows);
     if (t.startsWith('danh sach khach hang')) return { kind: 'khList', rows };
@@ -129,10 +130,13 @@ REAL.apply = parts => {
   if (parts.apTx) { const t = parts.apTerm ? REAL.apTerms(parts.apTerm.rows) : {}; const r = REAL.apOpen(parts.apTx.rows, t); M.ap = r.ap; asof = Math.max(asof, r.asof); log.push('Phải trả: ' + M.ap.length + ' hóa đơn' + (parts.apTerm ? ' (có kỳ hạn NCC)' : ' (chưa có file hạn thanh toán NCC → mặc định 30 ngày)')); }
   if (parts.loans) { M.loans = REAL.loans(REAL.rows(parts.loans.wb.Sheets[parts.loans.sheet])); log.push('Khoản vay: ' + M.loans.length); }
   let cash = 0, hasCash = false;
+  if (parts.bankLeds && parts.bankLeds.length > 1) parts.bankLed = parts.bankLeds.map(p => ({ p, b: REAL.bankLed(p.rows) })).filter(x => x.b).sort((a, b) => (b.b.asof || 0) - (a.b.asof || 0))[0].p;
   if (parts.bankLed) { const b = REAL.bankLed(parts.bankLed.rows); if (b) { cash += b.bal; hasCash = true; asof = Math.max(asof, b.asof || 0); log.push('Số dư NH (sổ NH): ' + fmtVnd(b.bal)); } }
   else if (parts.bankBal) { const b = REAL.bankBal(parts.bankBal.rows); if (b != null) { cash += b; hasCash = true; log.push('Số dư NH (bảng kê): ' + fmtVnd(b)); } }
+  if (parts.cashBooks && parts.cashBooks.length > 1) parts.cashBook = parts.cashBooks.map(p => ({ p, d: Math.max(0, ...REAL.txs(p.rows, 'cashBook').map(t => t.d)) })).sort((a, b) => b.d - a.d)[0].p;
   if (parts.cashBook) { const c = REAL.cashBook(parts.cashBook.rows); if (c != null) { cash += c; hasCash = true; log.push('Quỹ tiền mặt: ' + fmtVnd(c)); } }
   if (hasCash) M.S.cash0 = Math.round(cash);
+  if (parts.ktPlan && typeof REAL.ktBuild === 'function') { const kb = REAL.ktBuild(parts); if (kb) { M.kt = kb; log.push('Báo cáo tuần: kế hoạch KT tháng ' + kb.plan.month + '/' + kb.plan.year + ', thực hiện đến ' + fmtDate(kb.last)); } }
   if (asof) M.S.asof = asof;
   return log;
 };
