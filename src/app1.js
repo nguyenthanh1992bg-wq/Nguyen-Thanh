@@ -22,6 +22,12 @@ function deepMerge(base, add) {
   return o;
 }
 function loadModel() {
+  if (window.__REAL && localStorage.getItem('hg_real_ver') !== window.__REAL.ver) {
+    const b = blankModel(), j = window.__REAL.model; localStorage.setItem('hg_real_ver', window.__REAL.ver);
+    const m = { S: deepMerge(b.S, j.S), ar: j.ar, ap: j.ap, hist: j.hist, rec: j.rec, loans: j.loans, snaps: j.snaps || [] };
+    try { localStorage.setItem(LS_KEY, JSON.stringify(m)); } catch (e) { }
+    return m;
+  }
   try {
     const t = localStorage.getItem(LS_KEY); if (!t) return blankModel();
     const j = JSON.parse(t), b = blankModel();

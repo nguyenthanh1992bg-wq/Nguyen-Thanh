@@ -79,6 +79,7 @@ function defaultSettings() {
     asof: todayDn(),
     cash0: 0, minCash: null,
     monthlySales: 0, growth: 0, salesOverride: {},
+    monthEndPay: false, meShare: 65, meHazard: 30, mePattern: [0.417, 0.258, 0.095, 0.071, 0.066, 0.093],
     cashSalesPct: 10, termDays: null, extraDelay: 7, collectRate: 98,
     purchasePct: 65, purTermDays: null, apOverduePay: 7,
     inventory: 0, slowStock: 0,
@@ -231,7 +232,33 @@ function effPurTerm(S, M) { return S.purTermDays != null && S.purTermDays !== ''
 function buildEvents(M, scenId) {
   const S = M.S, sc = SCENARIOS[scenId || 'base'], asof = S.asof, ev = [];
   const stats = custStatsFromHist(M.hist);
-  const push = (d, a, c, k, o) => { if (d < 0) d = 0; if (d >= HORIZON || !a) return; ev.push(Object.assign({ d: Math.round(d), a, c, k }, o || {})); };
+  const push0 = (d, a, c, k, o) => { if (d < 0) d = 0; if (d >= HORIZON || !a) return; ev.push(Object.assign({ d: Math.round(d), a, c, k }, o || {})); };
+  /* Khách trả theo CHU KỲ CUỐI THÁNG: tiền thu được dồn vào 6 ngày làm việc cuối tháng (tỷ trọng mePattern: ngày cuối, kế cuối…) */
+  const meDays = {};
+  const lastBds = (y, m) => { const k = y + '-' + m; if (meDays[k]) return meDays[k]; const n = dim(y, m), out = []; for (let d = n; d >= 1 && out.length < 6; d--) { const wd = new Date(Date.UTC(y, m - 1, d)).getUTCDay(); if (wd !== 0 && wd !== 6) out.push(dn(y, m, d)); } return (meDays[k] = out); };
+  const clusterAt = (y, m, a, c, k, o, share) => {
+    const L = lastBds(y, m), w = S.mePattern, ok = L.filter(x => x >= asof + 1); if (!ok.length) return false;
+    const tw = ok.reduce((t, x) => t + w[L.indexOf(x)], 0);
+    ok.forEach(x => { const f = w[L.indexOf(x)] / tw; push0(x - asof, a * f, c, k, Object.assign({}, o, { gross: o && o.gross != null ? o.gross * f : undefined })); });
+    return true;
+  };
+  /* bán hàng/thu ngay: meShare% dồn vào cụm cuối tháng của tháng phát sinh, phần còn lại theo ngày thường */
+  const push = (d, a, c, k, o) => {
+    if (!S.monthEndPay || (k !== 'SALE' && k !== 'SALEC')) return push0(d, a, c, k, o);
+    const sh = (S.meShare == null ? 65 : S.meShare) / 100; push0(d, a * (1 - sh), c, k, Object.assign({}, o, { gross: o && o.gross != null ? o.gross * (1 - sh) : undefined }));
+    let t = ymd(asof + Math.max(0, Math.round(d))), tries = 0;
+    while (tries < 3 && !clusterAt(t.y, t.m, a * sh, c, k, o)) { t = t.m === 12 ? { y: t.y + 1, m: 1 } : { y: t.y, m: t.m + 1 }; tries++; }
+  };
+  /* phải thu hiện có: meShare% trả theo chu kỳ cuối tháng, xác suất mỗi chu kỳ theo phân phối hình học (meHazard%/chu kỳ) bắt đầu từ chu kỳ đầu tiên sau ngày đến hạn */
+  const pushAR = (x, p, d) => {
+    const sh = (S.meShare == null ? 65 : S.meShare) / 100, hz = (S.meHazard == null ? 30 : S.meHazard) / 100, tot = x.amt * p;
+    const o = { who: x.cust, gross: x.amt, p, over: x.over, b: x.b, ref: x.ref };
+    push0(Math.max(1, d), tot * (1 - sh), 'ar', 'AR', Object.assign({}, o, { gross: x.amt * (1 - sh) }));
+    let t = ymd(asof + Math.max(1, x.due - asof)), cyc = [];
+    for (let j = 0; j < 8; j++) { cyc.push({ y: t.y, m: t.m }); t = t.m === 12 ? { y: t.y + 1, m: 1 } : { y: t.y, m: t.m + 1 }; }
+    const ws = cyc.map((_, j) => Math.pow(1 - hz, j)), sw = ws.reduce((u, v) => u + v, 0);
+    cyc.forEach((cy, j) => { const f = ws[j] / sw; const used = clusterAt(cy.y, cy.m, tot * sh * f, 'ar', 'AR', Object.assign({}, o, { gross: x.amt * sh * f })); if (!used) push0(Math.max(1, d), tot * sh * f, 'ar', 'AR', Object.assign({}, o, { gross: x.amt * sh * f })); });
+  };
 
   /* 1) phải thu hiện có */
   const arA = analyzeAR(M.ar, S, M.hist);
@@ -244,6 +271,7 @@ function buildEvents(M, scenId) {
       const delay = (st && st.n >= 3 ? Math.max(0, st.delay) : S.extraDelay) + sc.dAdd;
       d = (x.due - asof) + Math.max(0, delay); spread = 5;
     } else { d = S.bucketWait[x.b] + Math.max(0, sc.dAdd); spread = Math.max(5, Math.round(S.bucketWait[x.b] * 0.3)); }
+    if (S.monthEndPay) { pushAR(x, p, d); return; }
     /* trải đều khoản thu quanh ngày dự kiến (25% – 50% – 25%) để không dồn cục vào một ngày */
     [[-1, 0.25], [0, 0.5], [1, 0.25]].forEach(([k, wgt]) => push(Math.max(1, d + k * spread), x.amt * p * wgt, 'ar', 'AR', { who: x.cust, gross: x.amt * wgt, p, over: x.over, b: x.b, ref: x.ref }));
   });
@@ -257,7 +285,8 @@ function buildEvents(M, scenId) {
     if (daily <= 0) continue;
     const cashPart = daily * S.cashSalesPct / 100, credPart = daily - cashPart;
     push(s + 1, cashPart, 'sale', 'SALEC');
-    push(s + lag, credPart * S.collectRate / 100, 'sale', 'SALE', { gross: credPart, s });
+    /* thu tiền bán chịu trải theo phân phối quanh số ngày thu bình quân (không dồn một điểm) để tránh “khoảng trống” giả trong dòng tiền */
+    [[-30, 0.15], [-15, 0.2], [0, 0.3], [15, 0.2], [30, 0.15]].forEach(([off, wgt]) => push(Math.max(s + 1, s + lag + off), credPart * S.collectRate / 100 * wgt, 'sale', 'SALE', { gross: credPart * wgt, s }));
     push(s + Math.max(1, purTerm), -daily * S.purchasePct / 100, 'buy', 'BUY', { s });
   }
 
@@ -292,15 +321,20 @@ function buildEvents(M, scenId) {
   (M.loans || []).forEach(L => {
     let bal = parseNum(L.balance) || 0; if (bal <= 0) return;
     const rate = (parseNum(L.rate) || 0) / 100, pm = parseNum(L.principal) || 0;
+    const rollPct = Math.min(1, Math.max(0, (parseNum(L.roll) || 0) / 100)); let rolled = false;
     for (let k = 0; k < 16 && bal > 0; k++) {
       let y = o0.y, m = o0.m + k; y += Math.floor((m - 1) / 12); m = ((m - 1) % 12) + 1;
       const day = dn(y, m, Math.min(Math.max(1, +L.day || 25), dim(y, m)));
       if (day < asof) continue;
-      const mature = L.maturity != null && day >= L.maturity;
-      const prin = mature ? bal : Math.min(bal, pm);
+      const mature = !rolled && L.maturity != null && day >= L.maturity;
+      const prin = mature ? bal : (rolled ? 0 : Math.min(bal, pm));
       push(day - asof, -bal * rate / 12, 'lai', 'LOAN', { who: L.name, rate });
-      if (prin > 0) push(day - asof, -prin, 'goc', 'LOANP', { who: L.name, rate, mature });
-      bal -= prin;
+      if (prin > 0) {
+        const pay = mature ? prin * (1 - rollPct) : prin;
+        if (pay > 0) push(day - asof, -pay, 'goc', 'LOANP', { who: L.name, rate, mature });
+        if (mature && rollPct >= 1) { rolled = true; continue; }   /* đảo nợ toàn phần: dư nợ & lãi tiếp tục */
+        bal -= pay;
+      }
     }
   });
   return ev;

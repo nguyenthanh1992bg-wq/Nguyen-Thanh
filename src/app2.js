@@ -13,6 +13,7 @@ function emptyState() {
 const dayLabel = d => { const o = ymd(M.S.asof + d); return String(o.d).padStart(2, '0') + '/' + String(o.m).padStart(2, '0'); };
 
 /* ---------------------------------------------------------------- TỔNG QUAN */
+const fmt0 = n => fmtVnd(+n || 0);
 function alertsList() {
   const A = R.arA, P = R.apA, S = M.S, out = [];
   const mb = R.mb.base, thr = R.thr;
@@ -23,7 +24,9 @@ function alertsList() {
   if (A.over60Pct * 100 > S.targetOver60) out.push(['warn', `Nợ quá hạn >60 ngày = ${pct(A.over60Pct)} dư nợ (${fmtVnd(A.over60)}), vượt mục tiêu ${S.targetOver60}%.`]);
   if (A.cust[0] && A.cust[0].share > 0.2) out.push(['warn', `Khách lớn nhất “${esc(A.cust[0].cust)}” chiếm ${pct(A.cust[0].share)} dư nợ – rủi ro tập trung.`]);
   if (P.overdue > 0) out.push(['warn', `Đang nợ quá hạn NCC ${fmtVnd(P.overdue)} – nguy cơ bị cắt hàng/tăng giá.`]);
-  (M.loans || []).forEach(L => { if (L.maturity != null && L.maturity - S.asof >= 0 && L.maturity - S.asof <= 90) out.push(['info', `Khoản vay “${esc(L.name)}” đáo hạn ${fmtDate(L.maturity)} (còn ${L.maturity - S.asof} ngày) – cần trả hoặc xin đảo nợ trước 30 ngày.`]); });
+  const ln = (M.loans || []).filter(L => L.maturity != null && L.maturity - S.asof >= 0 && L.maturity - S.asof <= 90 && (L.roll || 0) < 100).sort((a, b) => a.maturity - b.maturity);
+  ln.filter(L => L.maturity - S.asof <= 10).slice(0, 4).forEach(L => out.push(['info', `Khoản vay “${esc(L.name)}” đáo hạn ${fmtDate(L.maturity)} (còn ${L.maturity - S.asof} ngày) – ${fmt0(L.balance)} cần trả hoặc xin đảo nợ.`]));
+  if (ln.length > 4) out.push(['info', `${ln.length} khoản vay phải trả gốc trong 90 ngày tới, tổng ${fmtVnd(sum(ln, L => L.balance))} (chưa tính khoản được đảo nợ).`]);
   if (A.missingDue) out.push(['info', `${A.missingDue} hóa đơn phải thu không có hạn thanh toán – đã tạm tính theo ${R.term} ngày. Nên bổ sung để dự báo chính xác.`]);
   if (!S.monthlySales) out.push(['info', 'Chưa nhập doanh thu bán hàng tháng dự kiến – dòng tiền chỉ phản ánh công nợ hiện có (chưa có bán hàng mới). Vào tab Dữ liệu &amp; giả định.']);
   return out;

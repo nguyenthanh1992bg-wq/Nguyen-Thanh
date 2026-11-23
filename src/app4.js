@@ -7,6 +7,7 @@ const SFIELDS = [
   ['minCash', 'Ngưỡng tiền tối thiểu an toàn', 'money', 'Để trống = tự tính bằng 2 tuần chi phí cố định'],
   ['monthlySales', 'Doanh thu bán hàng dự kiến mỗi tháng (gồm VAT)', 'money', 'Dùng cho bán hàng mới, DSO. Có thể chỉnh từng tháng ở bảng dưới'],
   ['growth', 'Tăng trưởng doanh thu mỗi tháng (%)', 'num', ''],
+  ['monthEndPay', 'Khách trả tiền theo CHU KỲ CUỐI THÁNG (dồn vào 6 ngày làm việc cuối tháng)', 'check', 'Bật nếu lịch sử thu cho thấy tiền về tập trung cuối tháng'],
   ['cashSalesPct', 'Tỷ lệ doanh thu thu tiền ngay (%)', 'num', 'Bán lẻ/COD/đặt cọc'],
   ['termDays', 'Hạn thanh toán bình quân đơn mới (ngày)', 'num', 'Trống = lấy bình quân gia quyền từ dữ liệu phải thu'],
   ['extraDelay', 'Khách trả trễ bình quân thêm (ngày)', 'num', 'Dùng khi chưa có lịch sử thu của khách'],
@@ -47,8 +48,8 @@ VIEWS.data = () => {
    <div class="tw nomax"><table><thead><tr><th>Khoản mục</th><th>Loại chi</th><th>Thu/Chi</th><th>Số tiền (VND)</th><th>Ngày trong tháng</th><th>Tần suất</th><th>Bắt đầu / ngày chi</th><th>Kết thúc</th><th>Hoãn được</th><th></th></tr></thead><tbody>
    ${M.rec.map((r, i) => `<tr><td>${inp('rec.' + i + '.name', 'text')}</td><td>${inp('rec.' + i + '.cat', 'select', { opts: REC_CATS })}</td><td>${inp('rec.' + i + '.sign', 'select', { opts: [['chi', 'Chi'], ['thu', 'Thu']] })}</td><td>${inp('rec.' + i + '.amt', 'money')}</td><td>${inp('rec.' + i + '.day', 'num')}</td><td>${inp('rec.' + i + '.freq', 'select', { opts: FREQS })}</td><td>${inp('rec.' + i + '.start', 'date')}</td><td>${inp('rec.' + i + '.end', 'date')}</td><td class="c">${inp('rec.' + i + '.disc', 'check')}</td><td><button class="s d" data-act="delrow" data-p="rec" data-i="${i}">Xóa</button></td></tr>`).join('')}</tbody></table></div><p><button class="s" data-act="addrow" data-p="rec">+ Thêm khoản mục</button></p></div>
   <div class="card"><h2>7. Khoản vay ngân hàng</h2><p class="sub">Lãi = dư nợ × lãi suất / 12 mỗi tháng; gốc trả đều theo “gốc hằng tháng”, đến ngày đáo hạn trả hết dư nợ còn lại (để trống ngày đáo hạn nếu trả dần).</p>
-   <div class="tw nomax"><table><thead><tr><th>Khoản vay</th><th>Dư nợ (VND)</th><th>Lãi suất (%/năm)</th><th>Gốc trả hằng tháng</th><th>Ngày trả trong tháng</th><th>Ngày đáo hạn</th><th></th></tr></thead><tbody>
-   ${M.loans.map((r, i) => `<tr><td>${inp('loans.' + i + '.name', 'text')}</td><td>${inp('loans.' + i + '.balance', 'money')}</td><td>${inp('loans.' + i + '.rate', 'num')}</td><td>${inp('loans.' + i + '.principal', 'money')}</td><td>${inp('loans.' + i + '.day', 'num')}</td><td>${inp('loans.' + i + '.maturity', 'date')}</td><td><button class="s d" data-act="delrow" data-p="loans" data-i="${i}">Xóa</button></td></tr>`).join('')}</tbody></table></div><p><button class="s" data-act="addrow" data-p="loan">+ Thêm khoản vay</button></p></div>`;
+   <div class="tw nomax"><table><thead><tr><th>Khoản vay</th><th>Dư nợ (VND)</th><th>Lãi suất (%/năm)</th><th>Gốc trả hằng tháng</th><th>Ngày trả trong tháng</th><th>Ngày đáo hạn</th><th>Đảo nợ khi đáo hạn (%)</th><th></th></tr></thead><tbody>
+   ${M.loans.map((r, i) => `<tr><td>${inp('loans.' + i + '.name', 'text')}</td><td>${inp('loans.' + i + '.balance', 'money')}</td><td>${inp('loans.' + i + '.rate', 'num')}</td><td>${inp('loans.' + i + '.principal', 'money')}</td><td>${inp('loans.' + i + '.day', 'num')}</td><td>${inp('loans.' + i + '.maturity', 'date')}</td><td>${inp('loans.' + i + '.roll', 'num')}</td><td><button class="s d" data-act="delrow" data-p="loans" data-i="${i}">Xóa</button></td></tr>`).join('')}</tbody></table></div><p><button class="s" data-act="addrow" data-p="loan">+ Thêm khoản vay</button></p></div>`;
 };
 
 /* ---------------------------------------------------------------- NHẬP FILE */

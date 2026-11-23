@@ -289,6 +289,7 @@ function defaultSettings() {
     asof: todayDn(),
     cash0: 0, minCash: null,
     monthlySales: 0, growth: 0, salesOverride: {},
+    monthEndPay: false, meShare: 65, meHazard: 30, mePattern: [0.417, 0.258, 0.095, 0.071, 0.066, 0.093],
     cashSalesPct: 10, termDays: null, extraDelay: 7, collectRate: 98,
     purchasePct: 65, purTermDays: null, apOverduePay: 7,
     inventory: 0, slowStock: 0,
@@ -441,7 +442,33 @@ function effPurTerm(S, M) { return S.purTermDays != null && S.purTermDays !== ''
 function buildEvents(M, scenId) {
   const S = M.S, sc = SCENARIOS[scenId || 'base'], asof = S.asof, ev = [];
   const stats = custStatsFromHist(M.hist);
-  const push = (d, a, c, k, o) => { if (d < 0) d = 0; if (d >= HORIZON || !a) return; ev.push(Object.assign({ d: Math.round(d), a, c, k }, o || {})); };
+  const push0 = (d, a, c, k, o) => { if (d < 0) d = 0; if (d >= HORIZON || !a) return; ev.push(Object.assign({ d: Math.round(d), a, c, k }, o || {})); };
+  /* Khách trả theo CHU KỲ CUỐI THÁNG: tiền thu được dồn vào 6 ngày làm việc cuối tháng (tỷ trọng mePattern: ngày cuối, kế cuối…) */
+  const meDays = {};
+  const lastBds = (y, m) => { const k = y + '-' + m; if (meDays[k]) return meDays[k]; const n = dim(y, m), out = []; for (let d = n; d >= 1 && out.length < 6; d--) { const wd = new Date(Date.UTC(y, m - 1, d)).getUTCDay(); if (wd !== 0 && wd !== 6) out.push(dn(y, m, d)); } return (meDays[k] = out); };
+  const clusterAt = (y, m, a, c, k, o, share) => {
+    const L = lastBds(y, m), w = S.mePattern, ok = L.filter(x => x >= asof + 1); if (!ok.length) return false;
+    const tw = ok.reduce((t, x) => t + w[L.indexOf(x)], 0);
+    ok.forEach(x => { const f = w[L.indexOf(x)] / tw; push0(x - asof, a * f, c, k, Object.assign({}, o, { gross: o && o.gross != null ? o.gross * f : undefined })); });
+    return true;
+  };
+  /* bán hàng/thu ngay: meShare% dồn vào cụm cuối tháng của tháng phát sinh, phần còn lại theo ngày thường */
+  const push = (d, a, c, k, o) => {
+    if (!S.monthEndPay || (k !== 'SALE' && k !== 'SALEC')) return push0(d, a, c, k, o);
+    const sh = (S.meShare == null ? 65 : S.meShare) / 100; push0(d, a * (1 - sh), c, k, Object.assign({}, o, { gross: o && o.gross != null ? o.gross * (1 - sh) : undefined }));
+    let t = ymd(asof + Math.max(0, Math.round(d))), tries = 0;
+    while (tries < 3 && !clusterAt(t.y, t.m, a * sh, c, k, o)) { t = t.m === 12 ? { y: t.y + 1, m: 1 } : { y: t.y, m: t.m + 1 }; tries++; }
+  };
+  /* phải thu hiện có: meShare% trả theo chu kỳ cuối tháng, xác suất mỗi chu kỳ theo phân phối hình học (meHazard%/chu kỳ) bắt đầu từ chu kỳ đầu tiên sau ngày đến hạn */
+  const pushAR = (x, p, d) => {
+    const sh = (S.meShare == null ? 65 : S.meShare) / 100, hz = (S.meHazard == null ? 30 : S.meHazard) / 100, tot = x.amt * p;
+    const o = { who: x.cust, gross: x.amt, p, over: x.over, b: x.b, ref: x.ref };
+    push0(Math.max(1, d), tot * (1 - sh), 'ar', 'AR', Object.assign({}, o, { gross: x.amt * (1 - sh) }));
+    let t = ymd(asof + Math.max(1, x.due - asof)), cyc = [];
+    for (let j = 0; j < 8; j++) { cyc.push({ y: t.y, m: t.m }); t = t.m === 12 ? { y: t.y + 1, m: 1 } : { y: t.y, m: t.m + 1 }; }
+    const ws = cyc.map((_, j) => Math.pow(1 - hz, j)), sw = ws.reduce((u, v) => u + v, 0);
+    cyc.forEach((cy, j) => { const f = ws[j] / sw; const used = clusterAt(cy.y, cy.m, tot * sh * f, 'ar', 'AR', Object.assign({}, o, { gross: x.amt * sh * f })); if (!used) push0(Math.max(1, d), tot * sh * f, 'ar', 'AR', Object.assign({}, o, { gross: x.amt * sh * f })); });
+  };
 
   /* 1) phải thu hiện có */
   const arA = analyzeAR(M.ar, S, M.hist);
@@ -454,6 +481,7 @@ function buildEvents(M, scenId) {
       const delay = (st && st.n >= 3 ? Math.max(0, st.delay) : S.extraDelay) + sc.dAdd;
       d = (x.due - asof) + Math.max(0, delay); spread = 5;
     } else { d = S.bucketWait[x.b] + Math.max(0, sc.dAdd); spread = Math.max(5, Math.round(S.bucketWait[x.b] * 0.3)); }
+    if (S.monthEndPay) { pushAR(x, p, d); return; }
     /* trải đều khoản thu quanh ngày dự kiến (25% – 50% – 25%) để không dồn cục vào một ngày */
     [[-1, 0.25], [0, 0.5], [1, 0.25]].forEach(([k, wgt]) => push(Math.max(1, d + k * spread), x.amt * p * wgt, 'ar', 'AR', { who: x.cust, gross: x.amt * wgt, p, over: x.over, b: x.b, ref: x.ref }));
   });
@@ -467,7 +495,8 @@ function buildEvents(M, scenId) {
     if (daily <= 0) continue;
     const cashPart = daily * S.cashSalesPct / 100, credPart = daily - cashPart;
     push(s + 1, cashPart, 'sale', 'SALEC');
-    push(s + lag, credPart * S.collectRate / 100, 'sale', 'SALE', { gross: credPart, s });
+    /* thu tiền bán chịu trải theo phân phối quanh số ngày thu bình quân (không dồn một điểm) để tránh “khoảng trống” giả trong dòng tiền */
+    [[-30, 0.15], [-15, 0.2], [0, 0.3], [15, 0.2], [30, 0.15]].forEach(([off, wgt]) => push(Math.max(s + 1, s + lag + off), credPart * S.collectRate / 100 * wgt, 'sale', 'SALE', { gross: credPart * wgt, s }));
     push(s + Math.max(1, purTerm), -daily * S.purchasePct / 100, 'buy', 'BUY', { s });
   }
 
@@ -502,15 +531,20 @@ function buildEvents(M, scenId) {
   (M.loans || []).forEach(L => {
     let bal = parseNum(L.balance) || 0; if (bal <= 0) return;
     const rate = (parseNum(L.rate) || 0) / 100, pm = parseNum(L.principal) || 0;
+    const rollPct = Math.min(1, Math.max(0, (parseNum(L.roll) || 0) / 100)); let rolled = false;
     for (let k = 0; k < 16 && bal > 0; k++) {
       let y = o0.y, m = o0.m + k; y += Math.floor((m - 1) / 12); m = ((m - 1) % 12) + 1;
       const day = dn(y, m, Math.min(Math.max(1, +L.day || 25), dim(y, m)));
       if (day < asof) continue;
-      const mature = L.maturity != null && day >= L.maturity;
-      const prin = mature ? bal : Math.min(bal, pm);
+      const mature = !rolled && L.maturity != null && day >= L.maturity;
+      const prin = mature ? bal : (rolled ? 0 : Math.min(bal, pm));
       push(day - asof, -bal * rate / 12, 'lai', 'LOAN', { who: L.name, rate });
-      if (prin > 0) push(day - asof, -prin, 'goc', 'LOANP', { who: L.name, rate, mature });
-      bal -= prin;
+      if (prin > 0) {
+        const pay = mature ? prin * (1 - rollPct) : prin;
+        if (pay > 0) push(day - asof, -pay, 'goc', 'LOANP', { who: L.name, rate, mature });
+        if (mature && rollPct >= 1) { rolled = true; continue; }   /* đảo nợ toàn phần: dư nợ & lãi tiếp tục */
+        bal -= pay;
+      }
     }
   });
   return ev;
@@ -971,6 +1005,12 @@ function deepMerge(base, add) {
   return o;
 }
 function loadModel() {
+  if (window.__REAL && localStorage.getItem('hg_real_ver') !== window.__REAL.ver) {
+    const b = blankModel(), j = window.__REAL.model; localStorage.setItem('hg_real_ver', window.__REAL.ver);
+    const m = { S: deepMerge(b.S, j.S), ar: j.ar, ap: j.ap, hist: j.hist, rec: j.rec, loans: j.loans, snaps: j.snaps || [] };
+    try { localStorage.setItem(LS_KEY, JSON.stringify(m)); } catch (e) { }
+    return m;
+  }
   try {
     const t = localStorage.getItem(LS_KEY); if (!t) return blankModel();
     const j = JSON.parse(t), b = blankModel();
@@ -1105,6 +1145,7 @@ function emptyState() {
 const dayLabel = d => { const o = ymd(M.S.asof + d); return String(o.d).padStart(2, '0') + '/' + String(o.m).padStart(2, '0'); };
 
 /* ---------------------------------------------------------------- TỔNG QUAN */
+const fmt0 = n => fmtVnd(+n || 0);
 function alertsList() {
   const A = R.arA, P = R.apA, S = M.S, out = [];
   const mb = R.mb.base, thr = R.thr;
@@ -1115,7 +1156,9 @@ function alertsList() {
   if (A.over60Pct * 100 > S.targetOver60) out.push(['warn', `Nợ quá hạn >60 ngày = ${pct(A.over60Pct)} dư nợ (${fmtVnd(A.over60)}), vượt mục tiêu ${S.targetOver60}%.`]);
   if (A.cust[0] && A.cust[0].share > 0.2) out.push(['warn', `Khách lớn nhất “${esc(A.cust[0].cust)}” chiếm ${pct(A.cust[0].share)} dư nợ – rủi ro tập trung.`]);
   if (P.overdue > 0) out.push(['warn', `Đang nợ quá hạn NCC ${fmtVnd(P.overdue)} – nguy cơ bị cắt hàng/tăng giá.`]);
-  (M.loans || []).forEach(L => { if (L.maturity != null && L.maturity - S.asof >= 0 && L.maturity - S.asof <= 90) out.push(['info', `Khoản vay “${esc(L.name)}” đáo hạn ${fmtDate(L.maturity)} (còn ${L.maturity - S.asof} ngày) – cần trả hoặc xin đảo nợ trước 30 ngày.`]); });
+  const ln = (M.loans || []).filter(L => L.maturity != null && L.maturity - S.asof >= 0 && L.maturity - S.asof <= 90 && (L.roll || 0) < 100).sort((a, b) => a.maturity - b.maturity);
+  ln.filter(L => L.maturity - S.asof <= 10).slice(0, 4).forEach(L => out.push(['info', `Khoản vay “${esc(L.name)}” đáo hạn ${fmtDate(L.maturity)} (còn ${L.maturity - S.asof} ngày) – ${fmt0(L.balance)} cần trả hoặc xin đảo nợ.`]));
+  if (ln.length > 4) out.push(['info', `${ln.length} khoản vay phải trả gốc trong 90 ngày tới, tổng ${fmtVnd(sum(ln, L => L.balance))} (chưa tính khoản được đảo nợ).`]);
   if (A.missingDue) out.push(['info', `${A.missingDue} hóa đơn phải thu không có hạn thanh toán – đã tạm tính theo ${R.term} ngày. Nên bổ sung để dự báo chính xác.`]);
   if (!S.monthlySales) out.push(['info', 'Chưa nhập doanh thu bán hàng tháng dự kiến – dòng tiền chỉ phản ánh công nợ hiện có (chưa có bán hàng mới). Vào tab Dữ liệu &amp; giả định.']);
   return out;
@@ -1394,6 +1437,7 @@ const SFIELDS = [
   ['minCash', 'Ngưỡng tiền tối thiểu an toàn', 'money', 'Để trống = tự tính bằng 2 tuần chi phí cố định'],
   ['monthlySales', 'Doanh thu bán hàng dự kiến mỗi tháng (gồm VAT)', 'money', 'Dùng cho bán hàng mới, DSO. Có thể chỉnh từng tháng ở bảng dưới'],
   ['growth', 'Tăng trưởng doanh thu mỗi tháng (%)', 'num', ''],
+  ['monthEndPay', 'Khách trả tiền theo CHU KỲ CUỐI THÁNG (dồn vào 6 ngày làm việc cuối tháng)', 'check', 'Bật nếu lịch sử thu cho thấy tiền về tập trung cuối tháng'],
   ['cashSalesPct', 'Tỷ lệ doanh thu thu tiền ngay (%)', 'num', 'Bán lẻ/COD/đặt cọc'],
   ['termDays', 'Hạn thanh toán bình quân đơn mới (ngày)', 'num', 'Trống = lấy bình quân gia quyền từ dữ liệu phải thu'],
   ['extraDelay', 'Khách trả trễ bình quân thêm (ngày)', 'num', 'Dùng khi chưa có lịch sử thu của khách'],
@@ -1434,8 +1478,8 @@ VIEWS.data = () => {
    <div class="tw nomax"><table><thead><tr><th>Khoản mục</th><th>Loại chi</th><th>Thu/Chi</th><th>Số tiền (VND)</th><th>Ngày trong tháng</th><th>Tần suất</th><th>Bắt đầu / ngày chi</th><th>Kết thúc</th><th>Hoãn được</th><th></th></tr></thead><tbody>
    ${M.rec.map((r, i) => `<tr><td>${inp('rec.' + i + '.name', 'text')}</td><td>${inp('rec.' + i + '.cat', 'select', { opts: REC_CATS })}</td><td>${inp('rec.' + i + '.sign', 'select', { opts: [['chi', 'Chi'], ['thu', 'Thu']] })}</td><td>${inp('rec.' + i + '.amt', 'money')}</td><td>${inp('rec.' + i + '.day', 'num')}</td><td>${inp('rec.' + i + '.freq', 'select', { opts: FREQS })}</td><td>${inp('rec.' + i + '.start', 'date')}</td><td>${inp('rec.' + i + '.end', 'date')}</td><td class="c">${inp('rec.' + i + '.disc', 'check')}</td><td><button class="s d" data-act="delrow" data-p="rec" data-i="${i}">Xóa</button></td></tr>`).join('')}</tbody></table></div><p><button class="s" data-act="addrow" data-p="rec">+ Thêm khoản mục</button></p></div>
   <div class="card"><h2>7. Khoản vay ngân hàng</h2><p class="sub">Lãi = dư nợ × lãi suất / 12 mỗi tháng; gốc trả đều theo “gốc hằng tháng”, đến ngày đáo hạn trả hết dư nợ còn lại (để trống ngày đáo hạn nếu trả dần).</p>
-   <div class="tw nomax"><table><thead><tr><th>Khoản vay</th><th>Dư nợ (VND)</th><th>Lãi suất (%/năm)</th><th>Gốc trả hằng tháng</th><th>Ngày trả trong tháng</th><th>Ngày đáo hạn</th><th></th></tr></thead><tbody>
-   ${M.loans.map((r, i) => `<tr><td>${inp('loans.' + i + '.name', 'text')}</td><td>${inp('loans.' + i + '.balance', 'money')}</td><td>${inp('loans.' + i + '.rate', 'num')}</td><td>${inp('loans.' + i + '.principal', 'money')}</td><td>${inp('loans.' + i + '.day', 'num')}</td><td>${inp('loans.' + i + '.maturity', 'date')}</td><td><button class="s d" data-act="delrow" data-p="loans" data-i="${i}">Xóa</button></td></tr>`).join('')}</tbody></table></div><p><button class="s" data-act="addrow" data-p="loan">+ Thêm khoản vay</button></p></div>`;
+   <div class="tw nomax"><table><thead><tr><th>Khoản vay</th><th>Dư nợ (VND)</th><th>Lãi suất (%/năm)</th><th>Gốc trả hằng tháng</th><th>Ngày trả trong tháng</th><th>Ngày đáo hạn</th><th>Đảo nợ khi đáo hạn (%)</th><th></th></tr></thead><tbody>
+   ${M.loans.map((r, i) => `<tr><td>${inp('loans.' + i + '.name', 'text')}</td><td>${inp('loans.' + i + '.balance', 'money')}</td><td>${inp('loans.' + i + '.rate', 'num')}</td><td>${inp('loans.' + i + '.principal', 'money')}</td><td>${inp('loans.' + i + '.day', 'num')}</td><td>${inp('loans.' + i + '.maturity', 'date')}</td><td>${inp('loans.' + i + '.roll', 'num')}</td><td><button class="s d" data-act="delrow" data-p="loans" data-i="${i}">Xóa</button></td></tr>`).join('')}</tbody></table></div><p><button class="s" data-act="addrow" data-p="loan">+ Thêm khoản vay</button></p></div>`;
 };
 
 /* ---------------------------------------------------------------- NHẬP FILE */
@@ -1911,6 +1955,32 @@ VIEWS.rep = () => {
 };
 ACT.tab = t => { UI.tab = t.dataset.v; render(); const m = $('#main'); if (m) m.scrollTop = 0; };
 document.addEventListener('DOMContentLoaded', () => paintShell());
+
+/* =====================================================================
+ * APP – KẾ HOẠCH DÒNG TIỀN T11/2026 (bản do kế toán/đội phân tích lập, nạp cùng dữ liệu thật)
+ * ===================================================================== */
+if (window.__REAL && window.__REAL.plan11) {
+  NAVG[2][1].unshift(['kh11', '🗓', 'Kế hoạch T11/2026']); TITLE.kh11 = 'Kế hoạch dòng tiền tháng 11/2026'; TAB_ORDER.push('kh11');
+  VIEWS.kh11 = () => {
+    const P = window.__REAL.plan11, rows = P.rows, v = x => (x == null || x === '') ? '' : fm(x);
+    const head1 = P.weeks.map(w => `<th colspan="3">${w}</th>`).join('') + '<th colspan="3">CẢ THÁNG 11</th>';
+    const head2 = P.weeks.map(() => '<th class="n">Thực hiện</th><th class="n">Dự báo</th><th class="n">Tổng</th>').join('') + '<th class="n">Thực hiện</th><th class="n">Dự báo</th><th class="n">Tổng T11</th>';
+    const body = rows.map(r => {
+      const tot = /^(Tổng|TIỀN|DÒNG TIỀN|I\.|II\.)/.test(r.label) || r.bold;
+      const cells = r.vals.map((t, i) => `<td class="n" style="background:${t[0] ? '#eef7ee' : ''}">${v(t[0])}</td><td class="n" style="background:${t[1] ? '#fffbe6' : ''}">${v(t[1])}</td><td class="n"><b>${v(t[2])}</b></td>`).join('');
+      const m = r.month.map((x, i) => `<td class="n">${i === 2 ? '<b>' + v(x) + '</b>' : v(x)}</td>`).join('');
+      const neg = r.label.startsWith('TIỀN CUỐI') ? ' style="font-weight:700"' : '';
+      return `<tr class="${tot ? 'tot' : ''}"${neg}><td class="nw" title="${esc(r.note || '')}">${esc(r.label)}</td>${cells}${m}</tr>`;
+    }).join('');
+    const tk = P.track, keys = Object.keys(tk);
+    return `<div class="card" style="border-color:#1d4ed8"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div><h2 style="font-size:18px">BÁO CÁO KẾ HOẠCH DÒNG TIỀN THÁNG 11/2026</h2><p class="sub">Cập nhật ${P.updated} · thực hiện từ sổ ngân hàng (đến 21/11), sổ quỹ (đến 13/11), giải ngân vay trả thẳng NCC/lương · dự báo 22–30/11 · Đơn vị: triệu đồng. Rê chuột vào tên dòng để xem cơ sở tính.</p></div><div class="noprint"><button class="p" onclick="window.print()">In / Lưu PDF</button></div></div>
+    <div class="tw nomax"><table class="sticky1"><thead><tr><th rowspan="2">Nội dung</th>${head1}</tr><tr>${head2}</tr></thead><tbody>${body}</tbody></table></div>
+    <p class="note">Xanh = thực hiện · vàng = dự báo. Hệ số thu cuối tháng (90%) và các giả định chỉnh trong file Excel “KE_HOACH_DONG_TIEN_T11-2026.xlsx”.</p></div>
+    <div class="grid2"><div class="card"><h2>Nhà cung cấp: nhu cầu so với khả năng chi</h2>${tbl('k11t', [{ h: 'Chỉ tiêu', f: x => esc(x[0]) }, { h: 'Số tiền (tr)', c: 'n', f: x => '<b>' + fm(x[1]) + '</b>' }], keys.map(k => [k, tk[k]]), { nomax: 1 })}<div class="alert bad">Khả năng chi chỉ đáp ứng khoảng nửa nhu cầu → khoảng ${fT(tk[keys[keys.length - 1]])} tỷ chuyển sang tháng 12. Cần vay trả thẳng NCC / giãn có chọn lọc.</div></div>
+    <div class="card"><h2>Dòng tiền theo ngày 22–30/11 (dự báo)</h2>${tbl('k11d', [{ h: 'Ngày', f: d => d.d.split('-').reverse().slice(0, 2).join('/') }, { h: 'Thu KH', c: 'n', f: d => fm(d.thu) }, { h: 'Gốc vay', c: 'n', f: d => fm(d.goc) }, { h: 'Lãi', c: 'n', f: d => fm(d.lai) }, { h: 'Chi NCC', c: 'n', f: d => fm(d.ncc) }, { h: 'Số dư cuối', c: 'n', f: d => '<b>' + fm(d.close) + '</b>', cls: d => d.close < 200e6 ? 'cellwarn' : '' }], P.days, { nomax: 1 })}</div></div>
+    <div class="card"><h2>2 phương án đề xuất tháng 11 (chấm điểm /100)</h2>${tbl('k11l', [{ h: 'Mã', f: x => x.id }, { h: 'Phương án', f: x => esc(x.name) + (x.pick ? ' <span class="pill" style="background:#1d4ed8">ĐỀ XUẤT</span>' : '') }, { h: 'Điểm', c: 'c', f: x => `<b style="color:${scoreCol(x.score)}">${x.score}</b>`, v: x => x.score }, { h: 'Tiền giữ lại/kéo về (tr)', c: 'n', f: x => fm(x.impact) }, { h: 'Chi phí (tr)', c: 'n', f: x => fm(x.cost) }, { h: 'Ra tiền sau (ngày)', c: 'n', f: x => x.ttc }], P.levers, { sort: { k: 2, dir: 'desc' }, nomax: 1 })}<p class="note">Cách làm chi tiết từng bước, danh sách khách/NCC ưu tiên: xem sheet “Đề xuất 2 PA”, “Thu KH”, “Chi NCC ưu tiên” trong file Excel.</p></div>`;
+  };
+}
 
 </script>
 </body>
