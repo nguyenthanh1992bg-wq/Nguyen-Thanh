@@ -10,7 +10,7 @@ function mk(a) { const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(
   await p.addInitScript(f => { window.showDirectoryPicker = async () => ({ kind: 'directory', name: 'Du_lieu', queryPermission: async () => 'granted', requestPermission: async () => 'granted',
     entries: async function* () { for (const [n, a] of Object.entries(f)) yield [n, { kind: 'file', name: n, getFile: async () => new File([new Uint8Array(a)], n, { lastModified: Date.now() }) }]; } }); }, files);
   await p.goto('file://' + path.resolve(__dirname, '../Quan_tri_dong_tien_Hoang_Gia.html')); await p.waitForSelector('#main .card');
-  await p.click('nav [data-v=data]'); await p.click('#syncbtn'); await p.waitForTimeout(1500);
+  await p.click('#nav [data-v=data]'); await p.click('#syncbtn'); await p.waitForTimeout(1500);
   console.log(await p.textContent('#syncst')); console.log((await p.$$eval('.card.note li, ul.note li', l => l.map(x => x.textContent))).join('\n'));
   console.log(await p.evaluate(async () => { const d = await window.showDirectoryPicker(); const o=[]; for await (const [n,h] of d.entries()) { const f = await h.getFile(); const wb = XLSX.read(await f.arrayBuffer(), {type:'array'}); o.push(n+':'+wb.SheetNames+':'+sheetRows(wb.Sheets[wb.SheetNames[0]]).length+':'+(typeof classify)); } return o.join('|'); }));console.log('AR', await p.evaluate(() => M.ar.length), 'AP', await p.evaluate(() => M.ap.length), 'snaps', await p.evaluate(() => M.snaps.length));
   console.log(errs.length ? errs.join('\n') : 'Không lỗi JS'); await b.close();

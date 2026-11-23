@@ -3,21 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hoàng Gia PS – Quản trị công nợ & dòng tiền</title>
+<title>Hoàng Gia PS – Hệ thống quản trị tài chính</title>
 <style>
 /*STYLE*/
 </style>
 </head>
 <body>
-<header>
-  <h1>Hoàng Gia PS – Quản trị công nợ &amp; dòng tiền<small>Phải thu · Phải trả · Dự báo dòng tiền · Đề xuất 2 phương án mỗi tháng</small></h1>
-  <label class="asof">Ngày chốt số liệu <input type="date" id="asof"></label>
-  <button onclick="window.print()">In / PDF</button>
-</header>
-<div id="ribbon"></div>
-<nav id="nav"></nav>
-<main id="main"></main>
+<div id="app">
+ <aside id="side">
+  <div class="brand"><div class="logo">HG</div><div class="bt"><b>Hoàng Gia PS</b><small>Finance OS</small></div></div>
+  <nav id="nav"></nav>
+  <div class="sidefoot"><button class="sb" data-act="ai">🤖<span>Trợ lý AI</span></button><button class="sb" data-act="theme">🌓<span>Giao diện sáng/tối</span></button><button class="sb" data-act="collapse">◀<span>Thu gọn</span></button></div>
+ </aside>
+ <div id="wrap">
+  <header id="top">
+   <h1 id="ttl">Tổng quan</h1>
+   <button id="cmdk" data-act="cmd" title="Ctrl+K">🔎 Tìm lệnh, khách hàng… <kbd>Ctrl K</kbd></button>
+   <div style="flex:1"></div>
+   <span id="syncst2" class="note"></span>
+   <label class="asof">Ngày chốt <input type="date" id="asof"></label>
+   <button class="ib" data-act="bell" title="Thông báo">🔔<i id="bellN"></i></button>
+   <button class="ib" onclick="window.print()" title="In / PDF">🖨</button>
+  </header>
+  <div id="ribbon"></div>
+  <main id="main"></main>
+  <footer id="status"></footer>
+ </div>
+</div>
 <aside id="aipanel"></aside>
+<div id="bellp"></div>
 <script>
 /*XLSX*/
 </script>

@@ -102,3 +102,50 @@ body.aiopen #aipanel{display:flex}
 .aic{display:flex;flex-wrap:wrap;gap:5px;padding:6px 10px}.aif{display:flex;gap:6px;padding:6px 10px}.aif input{flex:1}
 .ais{padding:6px 12px 10px;font-size:12.5px;border-top:1px solid var(--line)}
 @media print{#ribbon,#aipanel{display:none!important}}
+
+/* ===== KHUNG GIAO DIỆN KIỂU PHẦN MỀM (OS shell) ===== */
+body{overflow:hidden}
+#app{display:flex;height:100vh}
+#side{width:232px;flex:none;background:#0b1b3a;color:#cbd5e1;display:flex;flex-direction:column;transition:width .15s;overflow:hidden}
+.brand{display:flex;gap:10px;align-items:center;padding:14px 14px 10px}
+.logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
+.bt b{color:#fff;display:block;line-height:1.1}.bt small{opacity:.6;font-size:11px}
+#side nav{flex-direction:column;gap:1px;padding:6px 8px;background:none;border:0;position:static;flex:1;overflow:auto}
+#side nav .ng{font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;opacity:.5;padding:12px 10px 4px}
+#side nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;border-radius:8px;background:none;color:#cbd5e1;padding:8px 10px;font-weight:500;border-bottom:0;white-space:nowrap}
+#side nav button .ic{font-size:17px;width:22px;text-align:center;flex:none}
+#side nav button:hover{background:#ffffff14}
+#side nav button.on{background:#1d4ed8;color:#fff}
+#side nav button .bd{margin-left:auto;background:#c62828;color:#fff;border-radius:99px;font-size:10.5px;padding:0 6px}
+.sidefoot{padding:8px;border-top:1px solid #ffffff1f;display:flex;flex-direction:column;gap:2px}
+.sb{display:flex;gap:10px;align-items:center;border:0;background:none;color:#cbd5e1;padding:7px 10px;border-radius:8px;text-align:left;white-space:nowrap}
+.sb:hover{background:#ffffff14}
+body.sc #side{width:60px}body.sc .bt,body.sc #side nav .ng,body.sc #side nav button span:not(.ic),body.sc .sb span,body.sc #side nav .bd{display:none}
+#wrap{flex:1;display:flex;flex-direction:column;min-width:0}
+#top{background:#fff;color:var(--ink);border-bottom:1px solid var(--line);padding:8px 18px;gap:12px;flex-wrap:nowrap}
+#top h1{flex:none;font-size:17px}
+#cmdk{min-width:290px;text-align:left;color:var(--mut);background:#f1f5f9;border-radius:9px}
+kbd{float:right;background:#fff;border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:11px}
+#top .asof{color:var(--mut)}#top input{border:1px solid var(--line)}
+.ib{position:relative;border:0;background:none;font-size:18px;padding:4px 8px}.ib i{position:absolute;top:-2px;right:0;background:#c62828;color:#fff;border-radius:99px;font-size:10px;font-style:normal;padding:0 5px}
+#ribbon{padding:2px 14px;flex:none;overflow-x:auto}
+#main{flex:1;overflow:auto;max-width:none;width:100%;margin:0;padding:16px 22px 40px}
+#status{flex:none;display:flex;gap:18px;align-items:center;background:#0b1b3a;color:#cbd5e1;font-size:12px;padding:4px 14px;white-space:nowrap;overflow:hidden}
+#status b{color:#fff}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+#bellp{display:none;position:fixed;top:56px;right:70px;width:380px;max-height:70vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px #0003;z-index:70;padding:10px 12px}
+#bellp.on{display:block}
+#pal{position:fixed;inset:0;background:#0006;z-index:80;display:flex;justify-content:center;padding-top:12vh}
+#pal>div{background:#fff;border-radius:14px;width:560px;max-width:94vw;max-height:70vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px #0006;align-self:flex-start}
+#pal input{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:14px 16px;font-size:15px;outline:0}
+#pal ul{list-style:none;margin:0;padding:6px;overflow:auto}
+#pal li{padding:8px 12px;border-radius:8px;cursor:pointer;display:flex;gap:10px}#pal li.on{background:var(--pri2)}#pal li small{margin-left:auto;color:var(--mut)}
+#aipanel{z-index:75}
+/* chế độ tối */
+body.dark{--bg:#0f1521;--card:#18202e;--ink:#e6eaf2;--mut:#93a0b5;--line:#2a3548;--pri:#6b9bff;--pri2:#1d2b4a;--zebra:#1c2535}
+body.dark #top,body.dark #ribbon,body.dark .modal>div,body.dark #bellp,body.dark #pal>div,body.dark #aipanel,body.dark .pick,body.dark .kpi,body.dark .aim .m.bot{background:#18202e;color:var(--ink)}
+body.dark #cmdk{background:#222c3e}body.dark th{background:#222d42;color:#cbd5e1}body.dark tr.tot td{background:#232e44}body.dark tr.sec td{background:#1f2a3d;color:#cbd5e1}
+body.dark input[type=text],body.dark input[type=date],body.dark select{background:#111926;color:var(--ink);border-color:#33415a}
+body.dark .rb:hover{background:#26324a}body.dark .alert{background:#2a2414;color:#e6eaf2}body.dark .alert.bad{background:#34171a}body.dark .alert.good{background:#14291d}body.dark .alert.info{background:#172542}
+body.dark .scorebar div{background:#1c2535}body.dark svg text{fill:#93a0b5}body.dark #aipanel .aim{background:#0f1521}
+@media print{body{overflow:visible}#app{display:block;height:auto}#side,#top,#status{display:none!important}#main{overflow:visible}}
+@media (max-width:900px){#side{width:60px}.bt,#side nav .ng,#side nav button span:not(.ic),.sb span{display:none}#cmdk{min-width:0}}
