@@ -12,7 +12,7 @@ const path = require('path');
   await p.waitForSelector('.hs .big');
   const tabs = ['home', 'ar', 'ap', 'cash', 'plan', 'strat', 'data'];
   for (const t of tabs) {
-    await p.click(`##nav [data-v=${t}]`); await p.waitForTimeout(150);
+    await p.click(`#nav [data-v=${t}]`); await p.waitForTimeout(150);
     const bad = await p.$$eval('#main .card h2', h => h.filter(x => x.textContent.includes('Lỗi')).length);
     console.log(t, 'cards', await p.$$eval('#main .card', c => c.length), bad ? 'LỖI HIỂN THỊ' : 'ok');
     if (out) await p.screenshot({ path: path.join(out, t + '.png'), fullPage: true });
