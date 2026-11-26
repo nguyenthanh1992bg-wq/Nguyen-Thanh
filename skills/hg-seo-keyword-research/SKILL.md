@@ -9,7 +9,7 @@ description: |
 ## Mục tiêu
 Biến SEO thành kênh sinh **yêu cầu báo giá B2B** (không chỉ traffic): ưu tiên keyword có ý định mua của phòng mua hàng nhà máy, đại lý, xưởng đóng gói, shop thương mại điện tử cỡ vừa/lớn. Đầu ra dùng được ngay cho đội Content và Sales.
 
-## DNA Hoàng Gia (nguồn sự thật – đọc trước khi làm)
+## DNA Hoàng Gia (nguồn sự thật – đọc `DNA_Hoang_Gia.md` cùng thư mục trước khi làm)
 > Nếu người dùng cung cấp file DNA Hoàng Gia (cùng bộ DNA mà skill HG-SALES-001 dùng: định vị, giọng văn, USP, khách hàng mục tiêu, danh mục, cam kết thương mại), **ưu tiên DNA đó, ghi đè các mục dưới đây khi mâu thuẫn**. Không tự bịa năng lực kỹ thuật, chứng nhận, MOQ, giá, thời gian giao chưa được xác nhận.
 
 | Hạng mục | Giá trị mặc định (cần xác nhận với DNA Hoàng Gia) |
