@@ -1,25 +1,26 @@
 # Gói quay video màng PE – thử hook A/B (V0.1, chờ duyệt)
 
 Công thức: skills/hg-video-ban-hang-ngan. DNA: skills/hg-seo-keyword-research/DNA_Hoang_Gia.md.
-Quy tắc: không nêu giá, MOQ, thời gian giao, chứng nhận, tên khách chưa duyệt. Ô `[…]` do QA/Sales điền.
+Quy tắc: không nêu giá, MOQ, thời gian giao, chứng nhận, tên khách chưa duyệt. 
 
-## Việc cần chốt TRƯỚC khi quay
-| # | Việc | Người chốt | Kết quả |
-|---|---|---|---|
-| 1 | Có tặng mẫu thử màng PE không; điều kiện, số lượng, hạn | Trưởng phòng kinh doanh | `[ ]` |
-| 2 | Thông số cho từng ngành (độ dày, khổ, lõi, loại màng) | QA/Kỹ thuật | `[ ]` |
-| 3 | Địa điểm quay (nhà máy Plastic hay kho) | Sản xuất | `[ ]` |
-| 4 | Người lên hình, người quay, ngày quay | Marketing | `[ ]` |
-| 5 | Hotline/email hiển thị: 0988 555 000, kinhdoanh@hoanggiaps.com | Kinh doanh xác nhận còn đúng | `[ ]` |
-| 6 | Quay trong khu sản xuất: đồ bảo hộ, khu vực được phép | An toàn lao động | `[ ]` |
+## Quyết định đã chốt (26/11/2026, Phó Giám đốc)
+| # | Việc | Kết quả |
+|---|---|---|
+| 1 | Ưu đãi | Doanh nghiệp **tặng mẫu màng PE**. Còn thiếu: điều kiện nhận mẫu (số lượng mẫu, đối tượng, hạn) – chưa nói trong video cho tới khi chốt |
+| 2 | Thông số | Màng PE phổ thông, **khổ 50 cm, cuộn 2,4 kg**, độ dày phổ thông. Chưa có số micron cụ thể: không nói con số độ dày trong video |
+| 3 | Địa điểm quay | Nhà máy Hoàng Gia. Ảnh gửi kèm cho thấy xưởng sạch in tem nhãn (sàn epoxy xanh, máy in nhãn cuộn, máy bế, công nhân áo bảo hộ xanh): dùng làm cảnh nền "nhà máy sạch, chuyên nghiệp"; cảnh màng PE vẫn cần quay riêng cuộn thật |
+| 4 | Người quay, an toàn | Không cần (đã bỏ khỏi checklist) |
+| 5 | Hotline/email | 0988 555 000, kinhdoanh@hoanggiaps.com (theo DNA; nhắc Kinh doanh xác nhận còn đúng) |
+
+Còn mở: điều kiện nhận mẫu; "2,4 kg" là khối lượng cả cuộn hay lõi trừ bì; bạn xác nhận nơi làm màng PE (ảnh là xưởng tem nhãn, không phải xưởng màng).
 
 ## Video A – Hook nỗi đau (xin mẫu thử)
 | Giây | Hình | Lời thoại | Chữ chèn |
 |---|---|---|---|
 | 0-3 | Pallet quấn lỏng nghiêng, cận mặt | "Pallet vừa lên xe đã xô lệch, anh chị có gặp chưa?" | HÀNG XÔ LỆCH VÌ QUẤN SAI MÀNG? |
-| 3-10 | Cầm cuộn màng PE, xoay sát camera | "Hoàng Gia PS có màng quấn pallet, màng chít, màng co. Nhắn kinh doanh để được tư vấn chọn loại và nhận mẫu thử [CẦN DUYỆT]." | XIN MẪU THỬ [CẦN DUYỆT] |
+| 3-10 | Cầm cuộn màng PE, xoay sát camera | "Hoàng Gia PS có màng quấn pallet, màng chít, màng co. Nhắn kinh doanh để được tư vấn chọn loại và nhận mẫu thử miễn phí." | TẶNG MẪU THỬ MÀNG PE |
 | 10-18 | Quấn thử một pallet, so lỏng với chặt | "Khác biệt nằm ở độ bám, độ co giãn và cách quấn." | ĐÚNG LOẠI, ĐÚNG CÁCH QUẤN |
-| 18-35 | Dây chuyền hoặc kho: cuộn màng, xe tải | "Thông số [độ dày, khổ, lõi] bên em xác nhận theo từng nhu cầu." | TƯ VẤN THEO HÀNG CỦA BẠN |
+| 18-35 | Dây chuyền hoặc kho: cuộn màng, xe tải | "Màng PE phổ thông khổ 50 phân, cuộn 2,4 ký. Cần thông số khác, bên em tư vấn theo nhu cầu." | KHỔ 50 CM · CUỘN 2,4 KG |
 | 35-42 | Chỉ tay xuống bình luận | "Nhắn MÀNG PE hoặc gọi 0988 555 000. Xin mẫu trước, đặt sau." | 0988 555 000 |
 
 ## Video B – Hook phá tin đồn (lead báo giá)
@@ -34,7 +35,7 @@ Quy tắc: không nêu giá, MOQ, thời gian giao, chứng nhận, tên khách 
 Lưu ý Video B: câu "hao màng, hỏng hàng" là nhận định chung, không kèm con số; Sales/QA đọc lại trước khi quay.
 
 ## Caption và bình luận ghim (dùng chung)
-Caption: "Chọn đúng màng PE giúp hàng ít xô lệch, ít hao hụt. Nhắn Hoàng Gia PS để được tư vấn và xin mẫu thử [CẦN DUYỆT]."
+Caption: "Chọn đúng màng PE giúp hàng ít xô lệch, ít hao hụt. Nhắn Hoàng Gia PS để được tư vấn và nhận mẫu thử miễn phí."
 Hashtag: #màngPE #đónggói #baobicongnghiep #HoangGiaPS #quấnpallet
 Bình luận ghim: "Hotline 0988 555 000 · kinhdoanh@hoanggiaps.com"
 
@@ -58,7 +59,6 @@ Bình luận ghim: "Hotline 0988 555 000 · kinhdoanh@hoanggiaps.com"
 Quy tắc chọn: giữ video có số yêu cầu mẫu/báo giá cao hơn; nếu bằng nhau, chọn giữ chân 3 giây cao hơn. Mẫu quá nhỏ (<1.000 lượt xem) thì chưa kết luận.
 
 ## Duyệt
-- [ ] Ưu đãi mẫu thử (Kinh doanh)
+- [ ] Điều kiện nhận mẫu (Kinh doanh)
 - [ ] Mọi câu về chất lượng/thông số (QA)
-- [ ] Cảnh quay khu sản xuất (An toàn)
 - [ ] Bản cuối trước khi đăng (Trưởng phòng)
