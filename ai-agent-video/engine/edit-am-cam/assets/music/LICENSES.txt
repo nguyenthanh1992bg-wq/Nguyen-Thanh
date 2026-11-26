@@ -1,0 +1,349 @@
+Giấy phép các bài nhạc trong thư mục này. Bài có dòng ghi công thì phải ghi công khi đăng video.
+
+calm__a-simple-trifle.ogg
+  Bài: A Simple Trifle — jestar
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://opengameart.org/content/a-simple-trifle
+
+calm__chill-out-theme.mp3
+  Bài: Chill Out Theme — Komiku
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://loyaltyfreakmusic.com/music/its-time-for-adventure-vol-2/
+
+calm__connecting-rainbows.mp3
+  Bài: Connecting Rainbows — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241215182328id_/https://freepd.com/world.php
+
+calm__goldberg-variations-bwv-988-01-aria.mp3
+  Bài: Goldberg Variations BWV 988 - 01 Aria — Kimiko Ishizaka (J.S. Bach)
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://opengoldbergvariations.org/
+
+calm__infinite-peace.mp3
+  Bài: Infinite Peace — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241216000928id_/https://freepd.com/misc.php
+
+calm__pond.mp3
+  Bài: Pond — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241215205646id_/https://freepd.com/romantic.php
+
+calm__quiet-saturday.mp3
+  Bài: Quiet Saturday — Komiku
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://loyaltyfreakmusic.com/music/poupis-incredible-adventures/
+
+calm__wisdom-in-the-sun.mp3
+  Bài: Wisdom in the Sun — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241216000928id_/https://freepd.com/misc.php
+
+corporate__advertime.mp3
+  Bài: Advertime — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php
+
+corporate__arpent.mp3
+  Bài: Arpent — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241217205507id_/https://freepd.com/electronic.php
+
+corporate__city-sunshine.mp3
+  Bài: City Sunshine — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php
+
+corporate__energizing.mp3
+  Bài: Energizing — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241216000928id_/https://freepd.com/misc.php
+
+corporate__meditating-beat.mp3
+  Bài: Meditating Beat — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241217205507id_/https://freepd.com/electronic.php
+
+dramatic__action-strike.mp3
+  Bài: Action Strike — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250108092110id_/https://freepd.com/scoring.php
+
+dramatic__battle-theme.mp3
+  Bài: Battle Theme — Komiku
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://loyaltyfreakmusic.com/music/its-time-for-adventure-vol-2/
+
+dramatic__epic-boss-battle.mp3
+  Bài: Epic Boss Battle — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250107032731id_/https://freepd.com/epic.php
+
+dramatic__evil-incoming.mp3
+  Bài: Evil Incoming — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250107032731id_/https://freepd.com/epic.php
+
+dramatic__hit-n-smash.mp3
+  Bài: Hit n Smash — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250107032731id_/https://freepd.com/epic.php
+
+dramatic__honor-bound.mp3
+  Bài: Honor Bound — Bryan Teoh
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250107032731id_/https://freepd.com/epic.php
+
+dramatic__night-attack.mp3
+  Bài: Night Attack — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250107032731id_/https://freepd.com/epic.php
+
+dramatic__tension.mp3
+  Bài: Tension — Komiku
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://loyaltyfreakmusic.com/music/its-time-for-adventure-vol-2/
+
+emotional__a-waltz-for-naseem.mp3
+  Bài: A Waltz For Naseem — dogsounds
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241216000928id_/https://freepd.com/misc.php
+
+emotional__at-the-end-of-hope.mp3
+  Bài: At the end of hope — Emma_MA
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://opengameart.org/content/at-the-end-of-hope
+
+emotional__bittersweet.mp3
+  Bài: Bittersweet — Emma_MA
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://opengameart.org/content/bittersweet
+
+emotional__emotional-blockbuster-2.mp3
+  Bài: Emotional Blockbuster 2 — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250107032731id_/https://freepd.com/epic.php
+
+emotional__lovely-piano-song.mp3
+  Bài: Lovely Piano Song — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241215205646id_/https://freepd.com/romantic.php
+
+emotional__nostalgic-piano.mp3
+  Bài: Nostalgic Piano — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241215205646id_/https://freepd.com/romantic.php
+
+emotional__patience-party.mp3
+  Bài: Patience Party — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241215205646id_/https://freepd.com/romantic.php
+
+emotional__piano-magic-motive.mp3
+  Bài: Piano Magic Motive — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241215205646id_/https://freepd.com/romantic.php
+
+emotional__sad-walk-with-sad-melodica.mp3
+  Bài: Sad walk with sad melodica — Komiku
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://loyaltyfreakmusic.com/music/its-time-for-adventure-vol-2/
+
+funny__busybody.mp3
+  Bài: Busybody — Bryan Teoh
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250104052211id_/https://freepd.com/comedy.php
+
+funny__disco-cat.mp3
+  Bài: Disco Cat — Komiku
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://loyaltyfreakmusic.com/music/poupis-incredible-adventures/
+
+funny__going-bananas.mp3
+  Bài: Going Bananas — Bryan Teoh
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250104052211id_/https://freepd.com/comedy.php
+
+funny__llama-in-pajama.mp3
+  Bài: Llama in Pajama — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250104052211id_/https://freepd.com/comedy.php
+
+funny__rush.mp3
+  Bài: Rush — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250104052211id_/https://freepd.com/comedy.php
+
+funny__spring-chicken.mp3
+  Bài: Spring Chicken — Bryan Teoh
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250104052211id_/https://freepd.com/comedy.php
+
+funny__wakka-wakka.mp3
+  Bài: Wakka Wakka — Bryan Teoh
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250104052211id_/https://freepd.com/comedy.php
+
+inspirational__adding-the-sun.mp3
+  Bài: Adding the Sun — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241216000928id_/https://freepd.com/misc.php
+
+inspirational__from-page-to-practice.mp3
+  Bài: From Page to Practice — Bryan Teoh
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php
+
+inspirational__infinite-wonder.mp3
+  Bài: Infinite Wonder — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241216000928id_/https://freepd.com/misc.php
+
+inspirational__inspiration.mp3
+  Bài: Inspiration — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php
+
+inspirational__inventing-flight.mp3
+  Bài: Inventing Flight — Bryan Teoh
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php
+
+inspirational__motions.mp3
+  Bài: Motions — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php
+
+inspirational__romantic-inspiration.mp3
+  Bài: Romantic Inspiration — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241215205646id_/https://freepd.com/romantic.php
+
+inspirational__victory.mp3
+  Bài: Victory — Komiku
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://loyaltyfreakmusic.com/music/its-time-for-adventure-vol-2/
+
+news__driving-concern.mp3
+  Bài: Driving Concern — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250108092110id_/https://freepd.com/scoring.php
+
+news__funky-energy-loop.mp3
+  Bài: Funky Energy Loop — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250108092110id_/https://freepd.com/scoring.php
+
+news__goodnightmare.mp3
+  Bài: Goodnightmare — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241217205507id_/https://freepd.com/electronic.php
+
+news__sciencenet-theme.mp3
+  Bài: Sciencenet Theme — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241216000928id_/https://freepd.com/misc.php
+
+news__stereotype-news.mp3
+  Bài: Stereotype News — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php
+
+upbeat__a-new-day.ogg
+  Bài: A New Day — SpiderDave
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://opengameart.org/content/a-new-day
+
+upbeat__and-just-like-that.mp3
+  Bài: And Just Like That — Bryan Teoh
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php
+
+upbeat__funshine.mp3
+  Bài: Funshine — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php
+
+upbeat__gotta-keep-on-movin.mp3
+  Bài: Gotta Keep On Movin — Bryan Teoh
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20241216000928id_/https://freepd.com/misc.php
+
+upbeat__happy-whistling-ukulele.mp3
+  Bài: Happy Whistling Ukulele — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php
+
+upbeat__pickled-pink.mp3
+  Bài: Pickled Pink — Kevin MacLeod
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php
+
+upbeat__poupi-on-a-scooter.mp3
+  Bài: Poupi on a scooter — Komiku
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://loyaltyfreakmusic.com/music/poupis-incredible-adventures/
+
+upbeat__ukulele-song.mp3
+  Bài: Ukulele Song — Rafael Krux
+  Giấy phép: CC0 1.0
+  Ghi công: không bắt buộc
+  Nguồn: https://web.archive.org/web/20250106221458id_/https://freepd.com/upbeat.php

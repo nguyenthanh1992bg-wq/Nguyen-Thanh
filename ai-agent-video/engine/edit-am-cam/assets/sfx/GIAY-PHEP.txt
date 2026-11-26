@@ -1,0 +1,40 @@
+Giấy phép kho tiếng động trong thư mục này (309 file FLAC 48 kHz và catalog.json).
+
+Nguồn: chép nguyên từ ~/projects/ai-video-studio/assets/sfx ngày 14/11/2026
+  Repo: AI Video Studio, https://github.com/nguyentatkiem/ai-video-studio
+  Bản chép: commit 168e1d37e81b52db79ed0994f26663c57fd2ed97 (12/11/2026)
+  Bản quyền: Copyright (c) 2026 Nguyễn Tất Kiểm, giấy phép MIT (toàn văn ở cuối file này).
+
+Cách tạo: mọi tiếng động do máy TỰ TỔNG HỢP 100% bằng script scripts/gen_sfx.py của repo trên
+(tạo sóng, lọc nhiễu, đường bao; không lấy mẫu thu âm của bên thứ ba). Tài liệu của repo ghi:
+"309 SFX và 30 bản nhạc nền do máy tự tạo, không vướng bản quyền" và "dùng tự do kể cả cho
+mục đích thương mại" (README.md, references/sound-library.md).
+
+Ghi công: không bắt buộc khi đăng video. Khi chép lại hoặc phát hành lại chính các file này
+thì giữ dòng bản quyền và giấy phép MIT bên dưới (theo NOTICE của repo gốc).
+
+Dùng trong ttn: ttn/tieng_dong.py đọc catalog.json và chọn tiếng theo luật (mở đầu, đổi cảnh,
+thẻ số liệu, thẻ kết). Không sửa nội dung file FLAC.
+
+------------------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2026 Nguyễn Tất Kiểm (nguyentatkiem.com.vn)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

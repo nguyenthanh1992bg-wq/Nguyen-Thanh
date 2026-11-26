@@ -1,0 +1,292 @@
+{
+  "fps": 30,
+  "duration": 15.85,
+  "talk": "jobs/20261126-154851-IMG7390/talk.mp4",
+  "scenes": [
+    {
+      "from": 0,
+      "to": 3.72,
+      "layout": "face",
+      "zoom": 1.0,
+      "zoomTo": 1.05,
+      "punches": [
+        {
+          "at": 1.84,
+          "z": 1.13
+        }
+      ]
+    },
+    {
+      "from": 3.72,
+      "to": 5.94,
+      "layout": "split",
+      "ui": {
+        "kind": "terminal",
+        "title": "Terminal — claude",
+        "steps": [
+          {
+            "t": "> edit video IMG_7390.mov theo style Ấm Cam",
+            "at": 3.78
+          },
+          {
+            "t": "Cắt khoảng lặng, tăng tốc x1,22",
+            "at": 4.42
+          },
+          {
+            "t": "Phụ đề, B-roll, nhạc nền, hiệu ứng",
+            "at": 4.9
+          },
+          {
+            "t": "✓ Xuất video hoàn chỉnh",
+            "at": 5.52
+          }
+        ]
+      }
+    },
+    {
+      "from": 5.94,
+      "to": 9.24,
+      "layout": "face",
+      "zoom": 1.06,
+      "zoomTo": 1.1,
+      "punches": [
+        {
+          "at": 7.1,
+          "z": 1.16
+        },
+        {
+          "at": 8.6,
+          "z": 1.02
+        }
+      ]
+    },
+    {
+      "from": 9.24,
+      "to": 10.82,
+      "layout": "light",
+      "light": {
+        "title": "AI hoàn toàn làm được",
+        "value": 100,
+        "suffix": "%"
+      }
+    },
+    {
+      "from": 10.82,
+      "to": 13.68,
+      "layout": "split",
+      "ui": {
+        "kind": "editor",
+        "title": "AI Editor",
+        "caption": "edit trọn video",
+        "dur": 2.9,
+        "steps": [
+          {
+            "t": "Cắt cảnh",
+            "at": 10.9
+          },
+          {
+            "t": "Phụ đề",
+            "at": 11.5
+          },
+          {
+            "t": "Graphic",
+            "at": 12.1
+          },
+          {
+            "t": "Âm thanh",
+            "at": 12.82
+          }
+        ]
+      }
+    },
+    {
+      "from": 13.68,
+      "to": 15.85,
+      "layout": "dark",
+      "compare": {
+        "left": {
+          "v": "nhân viên edit",
+          "sub": "trước đây",
+          "at": 14.08
+        },
+        "right": {
+          "v": "0 nhân viên",
+          "sub": "chỉ cần AI",
+          "at": 15.06
+        }
+      }
+    }
+  ],
+  "overlays": [
+    {
+      "type": "floaters",
+      "from": 0.2,
+      "to": 1.82,
+      "images": [
+        "jobs/20261126-154851-IMG7390/broll/out-kiem4k-512-e1.jpg",
+        "jobs/20261126-154851-IMG7390/broll/20261101-144630-THU-NGHIEM-AGENT-xoa-duo.jpg"
+      ],
+      "mode": "sides"
+    },
+    {
+      "type": "caption",
+      "from": 0.0,
+      "to": 1.82,
+      "pos": "top",
+      "lines": [
+        {
+          "t": "AI bây giờ",
+          "at": 0.78,
+          "accent": [
+            "AI"
+          ]
+        },
+        {
+          "t": "quá nguy hiểm",
+          "s": "serif",
+          "at": 1.16
+        }
+      ]
+    },
+    {
+      "type": "caption",
+      "from": 1.84,
+      "to": 3.7,
+      "pos": "top",
+      "lines": [
+        {
+          "t": "nhân viên edit",
+          "at": 2.46
+        },
+        {
+          "t": "phải dè chừng",
+          "s": "serif",
+          "at": 3.08
+        }
+      ]
+    },
+    {
+      "type": "caption",
+      "from": 3.72,
+      "to": 5.92,
+      "lines": [
+        {
+          "t": "AI tự edit",
+          "at": 4.16,
+          "accent": [
+            "AI"
+          ]
+        },
+        {
+          "t": "trọn video",
+          "s": "serif",
+          "at": 4.9
+        }
+      ]
+    },
+    {
+      "type": "caption",
+      "from": 5.94,
+      "to": 7.08,
+      "pos": "low",
+      "lines": [
+        {
+          "t": "bạn có thể dùng",
+          "at": 6.16
+        },
+        {
+          "t": "mọi hiệu ứng",
+          "s": "serif",
+          "at": 6.64
+        }
+      ]
+    },
+    {
+      "type": "floaters",
+      "from": 7.1,
+      "to": 9.24,
+      "images": [
+        "jobs/20261126-154851-IMG7390/broll/out-demo_raw.jpg",
+        "jobs/20261126-154851-IMG7390/broll/20261031-193757-THU-LUXURY-final-best.jpg",
+        "jobs/20261126-154851-IMG7390/broll/lan-1-treo-claude-final-v1.jpg",
+        "jobs/20261126-154851-IMG7390/broll/20261102-125825-AI-SOLO-BUSINESS-1-MEDVi.jpg",
+        "jobs/20261126-154851-IMG7390/broll/20261102-152217-AI-SOLO-BUSINESS-3-AI-ph.jpg",
+        "jobs/20261126-154851-IMG7390/broll/20261030-201543-THU-NGHIEM-AGENT-xoa-duo.jpg",
+        "jobs/20261126-154851-IMG7390/broll/20261102-142853-AI-BUSINESS-SYSTEM-2-5-A.jpg",
+        "jobs/20261126-154851-IMG7390/broll/20261102-122741-AI-SOLO-BUSINESS-2-Pilat.jpg"
+      ],
+      "mode": "strip"
+    },
+    {
+      "type": "caption",
+      "from": 7.1,
+      "to": 9.22,
+      "pos": "low",
+      "lines": [
+        {
+          "t": "video, hình ảnh",
+          "at": 7.1
+        },
+        {
+          "t": "cảnh nền B-roll",
+          "s": "serif",
+          "at": 8.6
+        }
+      ]
+    },
+    {
+      "type": "caption",
+      "from": 10.82,
+      "to": 12.5,
+      "lines": [
+        {
+          "t": "video này dùng",
+          "at": 11.1
+        },
+        {
+          "t": "Claude Code",
+          "s": "serif",
+          "at": 12.1
+        }
+      ]
+    },
+    {
+      "type": "pill",
+      "from": 12.52,
+      "to": 13.66,
+      "text": "edit trọn video"
+    }
+  ],
+  "sfx": [],
+  "music": {
+    "gen": true
+  },
+  "speed": 1.222,
+  "faceY": 0.64,
+  "captionY": 1470,
+  "_assets": {
+    "thumbs": [
+      "jobs/20261126-154851-IMG7390/thumbs/t1.jpg",
+      "jobs/20261126-154851-IMG7390/thumbs/t2.jpg",
+      "jobs/20261126-154851-IMG7390/thumbs/t3.jpg",
+      "jobs/20261126-154851-IMG7390/thumbs/t4.jpg",
+      "jobs/20261126-154851-IMG7390/thumbs/t5.jpg",
+      "jobs/20261126-154851-IMG7390/thumbs/t6.jpg"
+    ],
+    "screens": [],
+    "broll": [
+      "jobs/20261126-154851-IMG7390/broll/out-kiem4k-512-e1.jpg",
+      "jobs/20261126-154851-IMG7390/broll/20261101-144630-THU-NGHIEM-AGENT-xoa-duo.jpg",
+      "jobs/20261126-154851-IMG7390/broll/out-demo_raw.jpg",
+      "jobs/20261126-154851-IMG7390/broll/20261031-193757-THU-LUXURY-final-best.jpg",
+      "jobs/20261126-154851-IMG7390/broll/lan-1-treo-claude-final-v1.jpg",
+      "jobs/20261126-154851-IMG7390/broll/20261102-125825-AI-SOLO-BUSINESS-1-MEDVi.jpg",
+      "jobs/20261126-154851-IMG7390/broll/20261102-152217-AI-SOLO-BUSINESS-3-AI-ph.jpg",
+      "jobs/20261126-154851-IMG7390/broll/20261030-201543-THU-NGHIEM-AGENT-xoa-duo.jpg",
+      "jobs/20261126-154851-IMG7390/broll/20261102-142853-AI-BUSINESS-SYSTEM-2-5-A.jpg",
+      "jobs/20261126-154851-IMG7390/broll/20261102-122741-AI-SOLO-BUSINESS-2-Pilat.jpg",
+      "jobs/20261126-154851-IMG7390/broll/20261101-150002-THU-NGHIEM-AGENT-xoa-duo.jpg",
+      "jobs/20261126-154851-IMG7390/broll/20261010-173508-clip-thu-luxury-final-be.jpg"
+    ]
+  }
+}

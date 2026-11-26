@@ -1,0 +1,9 @@
+.env
+secrets/
+data/
+__pycache__/
+engine/edit-am-cam/node_modules/
+engine/edit-am-cam/work/
+engine/edit-am-cam/done/
+engine/edit-am-cam/public/jobs/
+engine/edit-am-cam/out/
