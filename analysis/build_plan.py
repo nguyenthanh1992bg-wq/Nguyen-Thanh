@@ -5,8 +5,12 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter as L
 
 OUT = '/home/user/Nguyen-Thanh/KE_HOACH_DONG_TIEN_T11-2026.xlsx'
-BANK_NOW, CASH_NOW = 726173271, 699887202           # sổ NH đến 21/11 (2.710.474.258 + thu 8.280.936.753 − chi 10.265.237.740) ; quỹ TM đến 13/11
-OPEN_BANK, OPEN_CASH = 2710474258, 692613645          # 01/11
+import json as _j
+_K = _j.load(open('/tmp/kt2.json', encoding='utf-8'))
+CASH_NOW = 752009107
+BANK_NOW = _K['cash0'] - CASH_NOW   # số dư NH + quỹ TM đến 23/11 (sổ NH, sổ quỹ)
+_unused = (726173271, 699887202)           # sổ NH đến 21/11 (2.710.474.258 + thu 8.280.936.753 − chi 10.265.237.740) ; quỹ TM đến 13/11
+OPEN_BANK, OPEN_CASH = 2710474258, 753215550          # 01/11
 # ---------------------------------------------------------------- 1. THỰC HIỆN
 A, bank, cash = actuals()
 # vay giải ngân trả thẳng NCC/lương (không qua sổ NH) – lấy từ file theo dõi vay
@@ -33,29 +37,16 @@ for m in (6, 7, 8, 9, 10):
     for i in range(6): rank_vals[i].append(allrec.get(Ld[i], 0))
     hist_rows.append((m, [allrec.get(Ld[i], 0) for i in range(6)], sum(v for d, v in allrec.items() if d.month == m)))
 rank_mean = [statistics.mean(rank_vals[i]) for i in range(6)]
-nov_bd = [d for d in bds(2026, 11) if d >= dt.date(2026, 11, 23)][::-1]       # 30,27,26,25,24,23
+nov_bd = [d for d in bds(2026, 11) if d >= dt.date(2026, 11, 24)][::-1]       # 30,27,26,25,24
 base_by_day = {d: rank_mean[i] for i, d in enumerate(nov_bd)}
 # ---------------------------------------------------------------- 3. NCC: nhu cầu theo hạn
-ap_open, apname, apled, apopen_bal, terms = ap_model.open_ap(dt.date(2026, 11, 13))
-code2sup = {}
-for o in ap_open: code2sup[o['code'].upper()] = o['sup']
-paid_ap = collections.defaultdict(float)
-for t in bank:
-    if t['cat'] == 'ncc' and dt.date(2026, 11, 13) < t['d'] <= CUT_BANK:
-        key = code2sup.get(str(t['code']).upper()) or next((o['sup'] for o in ap_open if o['sup'].strip().upper() == str(t['name']).strip().upper()), None)
-        paid_ap[key] += t['chi']
-aps = [dict(o) for o in ap_open if o['rem'] > 1]
-unm = 0.0
-for s, amt in paid_ap.items():
-    for o in sorted([x for x in aps if x['sup'] == s], key=lambda x: x['due']):
-        t = min(o['rem'], amt); o['rem'] -= t; amt -= t
-    unm += max(amt, 0)
-aps = [o for o in aps if o['rem'] > 1]
+import refresh_1123 as rf
+_apo, _ = rf.ap_open(); aps = [dict(o) for o in _apo if o['rem'] > 1]; unm = 0.0
 due_end = dt.date(2026, 11, 30)
-need_over = sum(o['rem'] for o in aps if o['due'] < dt.date(2026, 11, 23)); need_nov = sum(o['rem'] for o in aps if dt.date(2026, 11, 23) <= o['due'] <= due_end); need_dec = sum(o['rem'] for o in aps if o['due'] > due_end)
+need_over = sum(o['rem'] for o in aps if o['due'] < dt.date(2026, 11, 24)); need_nov = sum(o['rem'] for o in aps if dt.date(2026, 11, 24) <= o['due'] <= due_end); need_dec = sum(o['rem'] for o in aps if o['due'] > due_end)
 # ---------------------------------------------------------------- 4. MÔ HÌNH NGÀY 22–30/11 (python – để chấm điểm phương án)
-days = [dt.date(2026, 11, 22) + dt.timedelta(days=k) for k in range(9)]
-MAND = {dt.date(2026,11,24): (933480211, 0), dt.date(2026,11,25): (73400000 + 87000000 + 11000000, 180000000), dt.date(2026,11,30): (300805596, 0)}
+days = [dt.date(2026, 11, 24) + dt.timedelta(days=k) for k in range(7)]
+MAND = {dt.date(2026,11,25): (73400000 + 87000000 + 11000000, 180000000), dt.date(2026,11,30): (300805596, 0)}
 CP_DAILY = 1.258e9 / 21 * 1.0     # chi phí vận hành & khác: chạy theo tháng 10 (1,26 tỷ/21 ngày làm việc)
 def simulate(factor=1.0, buffer=150e6, mod=None):
     mod = mod or {}
@@ -85,10 +76,10 @@ d24, d27, d30 = dt.date(2026,11,24), dt.date(2026,11,27), dt.date(2026,11,30)
 levers = []
 def add(id_, name, why, mod, cost, ttc, feas, risk, steps, kpi, who):
     r, c = simulate(mod=mod); S = summarize(r, cost); d_ncc = S['ncc'] - B['ncc']; levers.append(dict(id=id_, name=name, why=why, ncc=d_ncc, cost=cost, ttc=ttc, feas=feas, risk=risk, steps=steps, kpi=kpi, who=who, S=S, d_end=S['end'] - B['end']))
-add('P1', 'Xin BIDV gia hạn/đảo nợ 2 khoản đáo hạn 24/11 (933,5 tr) & 30/11 (300,8 tr)', 'Hai khoản gốc BIDV chiếm 1,23 tỷ trong 7 ngày làm việc cuối tháng, trong khi tiền mặt+NH chỉ ~0,84 tỷ.',
-    dict(hoan_goc={d24: 933480211, d30: 300805596}), 1234285807 * 0.003 + 1234285807 * 0.08 * 90 / 365, 2, 3, 3,
-    ['Hôm nay (23/11): Phó GĐ + KT trưởng gặp BIDV, nộp phương án dòng tiền (file này) + danh sách khách sẽ trả cuối tháng.', 'Ưu tiên khoản 933,5 tr hạn 24/11: xin dời 3–5 ngày làm việc hoặc đảo nợ 90–180 ngày (hạn mức BIDV còn ~3,17 tỷ theo bảng TSĐB).', 'Khoản 300,8 tr hạn 30/11: đề nghị đảo nợ cùng đợt; chuẩn bị tất toán nếu thu cuối tháng đạt.', 'Không để phát sinh nợ quá hạn ngân hàng (ảnh hưởng CIC).'],
-    'Có văn bản chấp thuận trước 24/11; không phát sinh nợ quá hạn NH.', 'Phó GĐ + KT trưởng')
+add('P1', 'Xin BIDV đảo nợ khoản đáo hạn 30/11 (300,8 tr) và hoãn gốc định kỳ 25/11 (171,4 tr)', 'BIDV 933,5 tr đáo hạn đã trả ngày 23/11; còn 472 tr gốc phải trả trong 24–30/11 trong khi tiền mặt + NH chỉ ~1,47 tỷ và tiền khách dồn vào 27 và 30/11.',
+    dict(hoan_goc={dt.date(2026,11,25): 171400000, d30: 300805596}), 472205596 * 0.003 + 472205596 * 0.08 * 90 / 365, 2, 3, 3,
+    ['Hôm nay: Kế toán trưởng gặp BIDV, nộp phương án dòng tiền (file này) và danh sách khách sẽ trả cuối tháng.', 'Khoản 300,8 tr hạn 30/11: đề nghị đảo nợ 90–180 ngày (hạn mức BIDV còn ~3,17 tỷ theo bảng TSĐB).', 'Gốc định kỳ 171,4 tr hạn 25/11: xin dời sang kỳ sau hoặc trả sau ngày 27/11 khi tiền về.', 'Không để phát sinh nợ quá hạn ngân hàng (ảnh hưởng CIC).'],
+    'Có văn bản chấp thuận trước 25/11; không phát sinh nợ quá hạn NH.', 'Kế toán trưởng + Giám đốc')
 add('P2', 'Giải ngân vay VCB/Vietinbank trả thẳng nhà cung cấp đến hạn (~2,0 tỷ)', 'Công ty đã dùng cách này hàng tháng (T9: 3,95 tỷ; T10: 3,02 tỷ; T11 mới 0,86 tỷ trả lương). Hạn mức còn: Vietinbank ~19,4 tỷ, BIDV ~3,2 tỷ (bảng TSĐB).',
     dict(vay={d27: 2.0e9}, ncc_direct={d27: 2.0e9}, thu={}), 2.0e9 * 0.04 * 179 / 365 + 2.0e9 * 0.002, 3, 4, 3,
     ['Chọn 6–10 NCC có hóa đơn quá hạn/đến hạn lớn nhất (sheet “Chi NCC ưu tiên”) để giải ngân trả thẳng (khế ước theo từng NCC như thực tế đang làm).', 'Ưu tiên VCB (lãi ~4%/năm, 179 ngày); dùng Vietinbank nếu VCB hết hạn mức.', 'Chỉ dùng cho NCC cần giữ quan hệ/giá; không dùng để trả chi phí lặp lại.', 'Theo dõi tổng dư nợ/vốn lưu động: không vượt trần nội bộ.'],
@@ -102,7 +93,7 @@ add('P4', 'Chiết khấu thanh toán sớm 1% cho khách lớn không quá hạ
     ['Chọn khách hạng A/B (không quá hạn) có hóa đơn đến hạn trong T12.', 'Gửi thư đề nghị: trả trước 27/11 được CK 1%.', 'Xác nhận cách hạch toán chiết khấu với kế toán trưởng.'], 'Tỷ lệ khách chấp nhận ≥ 35%.', 'KD + KT')
 for lv in levers:
     if lv['id'] == 'P2': lv['impact_bal'] = 2.0e9       # NCC được trả thẳng bằng vay -> tiền giữ lại
-    elif lv['id'] == 'P1': lv['impact_bal'] = 1234285807
+    elif lv['id'] == 'P1': lv['impact_bal'] = 472205596
     elif lv['id'] == 'P3': lv['impact_bal'] = 0.25 * base_by_day[d30] * 1.0
     elif lv['id'] == 'P4': lv['impact_bal'] = 1.0e9 * 0.99 * 0.6
 # chấm điểm

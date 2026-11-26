@@ -11,6 +11,6 @@ def plan_json(path='/tmp/lo/KE_HOACH_DONG_TIEN_T11-2026.xlsx'):
     wp = wb['Đề xuất 2 PA']; lev = []
     for r in range(5, 9):
         if wp.cell(r, 1).value: lev.append(dict(id=wp.cell(r, 1).value, name=wp.cell(r, 2).value, type=wp.cell(r, 3).value, score=wp.cell(r, 4).value, impact=wp.cell(r, 9).value, cost=wp.cell(r, 10).value, ttc=wp.cell(r, 11).value, pick=bool(wp.cell(r, 12).value)))
-    wd = wb['Dòng tiền ngày 22-30.11']
-    days = [dict(d=str(wd.cell(r, 1).value)[:10], thu=wd.cell(r, 6).value, goc=wd.cell(r, 7).value, lai=wd.cell(r, 8).value, cp=wd.cell(r, 9).value, ncc=wd.cell(r, 11).value, close=wd.cell(r, 13).value) for r in range(9, 18)]
+    wd = wb['Dòng tiền ngày 24-30.11']
+    days = [dict(d=str(wd.cell(r, 1).value)[:10], thu=wd.cell(r, 6).value, goc=wd.cell(r, 7).value, lai=wd.cell(r, 8).value, cp=wd.cell(r, 9).value, ncc=wd.cell(r, 11).value, close=wd.cell(r, 13).value) for r in range(9, 16)]
     return dict(weeks=['Tuần 1 (01–08/11)', 'Tuần 2 (09–15/11)', 'Tuần 3 (16–22/11)', 'Tuần 4 (23–29/11)', 'Tuần 5 (30/11)'], rows=rows, track=track, levers=lev, days=days, updated='23/11/2026')

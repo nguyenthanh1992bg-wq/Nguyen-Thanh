@@ -5,8 +5,8 @@ import ap_model, bank_model as bm
 import openpyxl, collections, datetime as dt
 
 U = '/root/.claude/uploads/79bc319a-108c-5b8f-b18e-02ca38b35d45/'
-F_CASH = U + '7922dfb3-So_ke_toan_chi_tiet_quy_tien_mat_T11_den_13-11.xlsx'
-CUT_BANK = dt.date(2026, 11, 21); CUT_CASH = dt.date(2026, 11, 13)
+F_CASH = U + '3b698e9d-So_ke_toan_chi_tiet_quy_tien_mat_tu_01.11_den_23.11.xlsx'
+CUT_BANK = dt.date(2026, 11, 23); CUT_CASH = dt.date(2026, 11, 23)
 WEEKS = [('Tuần 1 (01–08/11)', dt.date(2026,11,1), dt.date(2026,11,8)), ('Tuần 2 (09–15/11)', dt.date(2026,11,9), dt.date(2026,11,15)),
          ('Tuần 3 (16–22/11)', dt.date(2026,11,16), dt.date(2026,11,22)), ('Tuần 4 (23–29/11)', dt.date(2026,11,23), dt.date(2026,11,29)), ('Tuần 5 (30/11)', dt.date(2026,11,30), dt.date(2026,11,30))]
 def wk(d):

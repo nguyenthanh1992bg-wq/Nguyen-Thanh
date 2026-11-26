@@ -1,6 +1,6 @@
 import openpyxl, datetime as dt, collections
 U = '/root/.claude/uploads/79bc319a-108c-5b8f-b18e-02ca38b35d45/'
-F_NOV = U + '6951eb30-So_tien_gui_ngan_hang_2026-11-01_den_2026-11-30.xlsx'
+F_NOV = U + 'c10dd27b-So_tien_gui_ngan_hang_tu_01.11_den_23.11.xlsx'
 F_OCT = U + '7c4301e3-So_tien_gui_ngan_hang.xlsx'
 num = lambda x: x if isinstance(x, (int, float)) else 0
 CATMAP = [('1311', 'thu_kh'), ('131', 'thu_kh'), ('3311', 'ncc'), ('331', 'ncc'), ('3341', 'luong'), ('334', 'luong'), ('3383', 'bh'), ('3384', 'bh'), ('3385', 'bh'), ('338', 'bh'),
