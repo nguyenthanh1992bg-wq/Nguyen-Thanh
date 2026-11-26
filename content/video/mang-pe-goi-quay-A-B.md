@@ -6,21 +6,20 @@ Quy tắc: không nêu giá, MOQ, thời gian giao, chứng nhận, tên khách 
 ## Quyết định đã chốt (26/11/2026, Phó Giám đốc)
 | # | Việc | Kết quả |
 |---|---|---|
-| 1 | Ưu đãi | Doanh nghiệp **tặng mẫu màng PE**. Còn thiếu: điều kiện nhận mẫu (số lượng mẫu, đối tượng, hạn) – chưa nói trong video cho tới khi chốt |
-| 2 | Thông số | Màng PE phổ thông, **khổ 50 cm, cuộn 2,4 kg**, độ dày phổ thông. Chưa có số micron cụ thể: không nói con số độ dày trong video |
-| 3 | Địa điểm quay | Nhà máy Hoàng Gia. Ảnh gửi kèm cho thấy xưởng sạch in tem nhãn (sàn epoxy xanh, máy in nhãn cuộn, máy bế, công nhân áo bảo hộ xanh): dùng làm cảnh nền "nhà máy sạch, chuyên nghiệp"; cảnh màng PE vẫn cần quay riêng cuộn thật |
-| 4 | Người quay, an toàn | Không cần (đã bỏ khỏi checklist) |
-| 5 | Hotline/email | 0988 555 000, kinhdoanh@hoanggiaps.com (theo DNA; nhắc Kinh doanh xác nhận còn đúng) |
+| 1 | Ưu đãi | **Tặng mẫu màng PE** cho khách có nhu cầu mua/sử dụng thật; **hạn nhận mẫu trong 5 ngày** |
+| 2 | Thông số | Màng PE phổ thông, **khổ 50 cm, cuộn 2,4 kg (đã gồm lõi)**, độ dày phổ thông. Chưa có số micron: không nói con số độ dày |
+| 3 | Địa điểm quay | **Nhà máy Plastic (Yên Mỹ, Thanh Trì, Hà Nội)** cho cảnh sản xuất màng PE. Ảnh xưởng sạch in tem nhãn (nhà máy Printing) chỉ dùng làm cảnh nền phụ nếu cần |
+| 4 | Hotline/email | 0988 555 000, kinhdoanh@hoanggiaps.com (nhắc Kinh doanh xác nhận còn đúng) |
 
-Còn mở: điều kiện nhận mẫu; "2,4 kg" là khối lượng cả cuộn hay lõi trừ bì; bạn xác nhận nơi làm màng PE (ảnh là xưởng tem nhãn, không phải xưởng màng).
+Còn mở: "5 ngày" tính từ khi đăng video hay từ khi khách gửi yêu cầu (đề xuất: từ ngày đăng, ghi rõ ngày hết hạn trên video); số lượng mẫu mỗi khách và chi phí giao mẫu (hiện chưa nói trong video).
 
 ## Video A – Hook nỗi đau (xin mẫu thử)
 | Giây | Hình | Lời thoại | Chữ chèn |
 |---|---|---|---|
 | 0-3 | Pallet quấn lỏng nghiêng, cận mặt | "Pallet vừa lên xe đã xô lệch, anh chị có gặp chưa?" | HÀNG XÔ LỆCH VÌ QUẤN SAI MÀNG? |
-| 3-10 | Cầm cuộn màng PE, xoay sát camera | "Hoàng Gia PS có màng quấn pallet, màng chít, màng co. Nhắn kinh doanh để được tư vấn chọn loại và nhận mẫu thử miễn phí." | TẶNG MẪU THỬ MÀNG PE |
+| 3-10 | Cầm cuộn màng PE, xoay sát camera | "Hoàng Gia PS có màng quấn pallet, màng chít, màng co. Khách có nhu cầu mua hoặc sử dụng nhắn kinh doanh để nhận mẫu thử miễn phí, hạn nhận trong 5 ngày." | TẶNG MẪU THỬ · HẠN 5 NGÀY |
 | 10-18 | Quấn thử một pallet, so lỏng với chặt | "Khác biệt nằm ở độ bám, độ co giãn và cách quấn." | ĐÚNG LOẠI, ĐÚNG CÁCH QUẤN |
-| 18-35 | Dây chuyền hoặc kho: cuộn màng, xe tải | "Màng PE phổ thông khổ 50 phân, cuộn 2,4 ký. Cần thông số khác, bên em tư vấn theo nhu cầu." | KHỔ 50 CM · CUỘN 2,4 KG |
+| 18-35 | Nhà máy Plastic: dây chuyền/cuộn màng, kho, xe tải | "Màng PE phổ thông khổ 50 phân, cuộn 2,4 ký tính cả lõi. Cần thông số khác, bên em tư vấn theo nhu cầu." | KHỔ 50 CM · CUỘN 2,4 KG (CẢ LÕI) |
 | 35-42 | Chỉ tay xuống bình luận | "Nhắn MÀNG PE hoặc gọi 0988 555 000. Xin mẫu trước, đặt sau." | 0988 555 000 |
 
 ## Video B – Hook phá tin đồn (lead báo giá)
@@ -59,6 +58,6 @@ Bình luận ghim: "Hotline 0988 555 000 · kinhdoanh@hoanggiaps.com"
 Quy tắc chọn: giữ video có số yêu cầu mẫu/báo giá cao hơn; nếu bằng nhau, chọn giữ chân 3 giây cao hơn. Mẫu quá nhỏ (<1.000 lượt xem) thì chưa kết luận.
 
 ## Duyệt
-- [ ] Điều kiện nhận mẫu (Kinh doanh)
+- [ ] Ngày hết hạn nhận mẫu và số lượng mẫu/khách (Kinh doanh)
 - [ ] Mọi câu về chất lượng/thông số (QA)
 - [ ] Bản cuối trước khi đăng (Trưởng phòng)
