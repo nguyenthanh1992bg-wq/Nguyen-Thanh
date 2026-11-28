@@ -331,3 +331,97 @@ describe('reducer', () => {
     expect(s.game.avatar).toBe('cat');
   });
 });
+
+import { pictureRound, matchDeck, speedQuestion, seeded, coinsFor, GAME_DAILY_CAP } from './games';
+import { levelOf, coinsOf, badgeStates, chestState, chestKey } from './game';
+import { PICTURE_WORDS, AVATARS } from '../data/game';
+import { dayKey } from './daily';
+
+describe('trò chơi', () => {
+  it('đố hình: mỗi câu có đúng 4 lựa chọn không trùng và chứa đáp án', () => {
+    const qs = pictureRound(8, seeded(1));
+    expect(qs).toHaveLength(8);
+    for (const q of qs) {
+      expect(q.options).toHaveLength(4);
+      expect(new Set(q.options).size).toBe(4);
+      expect(q.options).toContain(q.answer);
+      expect(PICTURE_WORDS.find((w) => w.en === q.answer)?.emoji).toBe(q.emoji);
+    }
+  });
+  it('lật thẻ: mỗi cặp có đúng một hình và một từ', () => {
+    const deck = matchDeck(6, seeded(2));
+    expect(deck).toHaveLength(12);
+    for (const pair of new Set(deck.map((c) => c.pair))) {
+      const cs = deck.filter((c) => c.pair === pair);
+      expect(cs.map((c) => c.kind).sort()).toEqual(['pic', 'word']);
+    }
+  });
+  it('tốc độ: đáp án nằm trong lựa chọn; từ điển hình không trùng nghĩa/hình', () => {
+    for (let i = 0; i < 30; i++) {
+      const q = speedQuestion(seeded(i));
+      expect(q.options).toContain(q.answer);
+      expect(new Set(q.options).size).toBe(4);
+    }
+    expect(new Set(PICTURE_WORDS.map((w) => w.en)).size).toBe(PICTURE_WORDS.length);
+    expect(new Set(PICTURE_WORDS.map((w) => w.vi)).size).toBe(PICTURE_WORDS.length);
+  });
+  it('xu thưởng có giới hạn mỗi ngày', () => {
+    let s = emptyData();
+    const day = dayKey(NOW);
+    s = reducer(s, { type: 'game-result', game: 'picture', score: 6, coins: coinsFor.picture(6), day });
+    s = reducer(s, { type: 'game-result', game: 'speed', score: 40, coins: 25, day });
+    expect(s.game.gameCoins).toBe(GAME_DAILY_CAP);
+    s = reducer(s, { type: 'game-result', game: 'speed', score: 50, coins: 15, day });
+    expect(s.game.gameCoins).toBe(GAME_DAILY_CAP);
+    s = reducer(s, { type: 'game-result', game: 'speed', score: 50, coins: 15, day: 'ngày-khác' });
+    expect(s.game.gameCoins).toBe(GAME_DAILY_CAP + 15);
+    expect(s.game.best.speed).toBe(50);
+  });
+});
+
+describe('phần thưởng', () => {
+  it('xu = điểm học/5 + thưởng + trò chơi − đã tiêu; mua nhân vật trừ xu và không mua hai lần', () => {
+    let s = emptyData();
+    for (let i = 0; i < 20; i++) s = sim(s, 'ls-tobe-p1', true, NOW + i, 'practice'); // 200 điểm = 40 xu
+    expect(coinsOf(s, NOW + 100)).toBe(40);
+    const panda = AVATARS.find((a) => a.id === 'panda')!;
+    s = reducer(s, { type: 'claim', key: 'x', coins: 20 });
+    s = reducer(s, { type: 'claim', key: 'x', coins: 20 }); // nhận lặp không có tác dụng
+    expect(coinsOf(s, NOW + 100)).toBe(60);
+    s = reducer(s, { type: 'buy', itemId: panda.id, cost: panda.cost });
+    s = reducer(s, { type: 'buy', itemId: panda.id, cost: panda.cost });
+    expect(coinsOf(s, NOW + 100)).toBe(0);
+    s = reducer(s, { type: 'avatar', id: 'unicorn' }); // chưa sở hữu nên không đổi được
+    expect(s.game.avatar).toBe('cat');
+    s = reducer(s, { type: 'avatar', id: 'panda' });
+    expect(s.game.avatar).toBe('panda');
+  });
+  it('đổi phần thưởng của phụ huynh trừ xu và ghi nhận để phụ huynh trao', () => {
+    let s = emptyData();
+    s = reducer(s, { type: 'claim', key: 'a', coins: 200 });
+    s = reducer(s, { type: 'redeem', reward: s.game.rewards[0], ts: NOW });
+    expect(coinsOf(s, NOW)).toBe(200 - s.game.rewards[0].cost);
+    expect(s.game.redeemed[0].done).toBe(false);
+    s = reducer(s, { type: 'redeem-done', ts: NOW });
+    expect(s.game.redeemed[0].done).toBe(true);
+  });
+  it('cấp độ tăng theo điểm; rương ngày chỉ mở khi đủ mục tiêu và chỉ nhận một lần', () => {
+    expect(levelOf(0).name).toBe('Hạt giống');
+    expect(levelOf(120).level).toBe(2);
+    let s = emptyData();
+    for (let i = 0; i < DAILY_GOAL - 1; i++) s = sim(s, 'ls-tobe-p1', true, NOW + i, 'practice');
+    expect(chestState(s, NOW + 100).reached).toBe(false);
+    s = sim(s, 'ls-tobe-p2', true, NOW + 50, 'practice');
+    expect(chestState(s, NOW + 100).reached).toBe(true);
+    s = reducer(s, { type: 'claim', key: chestKey(NOW + 100), coins: 20 });
+    expect(chestState(s, NOW + 100).claimed).toBe(true);
+  });
+  it('huy hiệu mở đúng điều kiện', () => {
+    let s = emptyData();
+    expect(badgeStates(s, NOW).every((b) => !b.unlocked)).toBe(true);
+    s = simulateLesson(simulatePlacement(s, NOW, () => false), 'lesson-tobe', NOW + 1000, 3);
+    const ids = badgeStates(s, NOW + 2000).filter((b) => b.unlocked).map((b) => b.id);
+    expect(ids).toEqual(expect.arrayContaining(['start', 'lesson1', 'perfect']));
+    expect(ids).not.toContain('streak7');
+  });
+});

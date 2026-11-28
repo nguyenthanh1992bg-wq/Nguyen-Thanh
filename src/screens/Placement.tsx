@@ -236,7 +236,17 @@ function ReviewAnswers({ attempts }: { attempts: Attempt[] }) {
   );
 }
 
-export function FlowBar({ title, onExit, exitLabel = 'Thoát' }: { title: string; onExit: () => void; exitLabel?: string }) {
+export function FlowBar({ title, onExit, exitLabel = 'Thoát', progress }: { title: string; onExit: () => void; exitLabel?: string; progress?: number }) {
+  if (progress !== undefined) {
+    return (
+      <div className="flowbar flowbar-bar">
+        <button type="button" className="xbtn" onClick={onExit} aria-label={exitLabel}>✕</button>
+        <div className="thickbar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)} aria-label={title}>
+          <div className="thickbar-fill" style={{ width: `${Math.max(4, progress)}%` }} />
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flowbar">
       <strong>{title}</strong>

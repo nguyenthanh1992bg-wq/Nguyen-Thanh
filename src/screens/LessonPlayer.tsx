@@ -103,14 +103,9 @@ function LessonRun({ lessonId, preview, onRestart }: { lessonId: string; preview
 
   return (
     <div className="stack">
-      <FlowBar title={lesson.title} onExit={() => go(preview ? { name: 'content' } : { name: 'home' })} exitLabel={preview ? 'Đóng xem trước' : 'Thoát'} />
+      <FlowBar title={lesson.title} progress={(stepIdx / (ORDER.length - 1)) * 100} onExit={() => go(preview ? { name: 'content' } : { name: 'home' })} exitLabel={preview ? 'Đóng xem trước' : 'Thoát'} />
       {preview && <Note kind="demo">Chế độ xem trước của giáo viên: kết quả không được lưu.</Note>}
-      <div className="stepper" aria-label="Các bước của bài học">
-        {ORDER.filter((s) => s !== 'warmup' || warm.length > 0).map((s) => (
-          <span key={s} className={`dot ${s === step ? 'dot-on' : ORDER.indexOf(s) < stepIdx ? 'dot-done' : ''}`} title={STEP_LABEL[s]} />
-        ))}
-      </div>
-      <p className="muted small">Bước: {STEP_LABEL[step]}</p>
+      <p className="steplabel">{lesson.title} · {STEP_LABEL[step]}</p>
 
       {step === 'warmup' && (
         <Card>

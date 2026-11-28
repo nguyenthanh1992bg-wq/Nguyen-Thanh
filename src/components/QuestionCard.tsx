@@ -168,45 +168,45 @@ export function QuestionCard({ q, mode, onAttempt, onNext, nextLabel = 'Tiếp t
         </ul>
       )}
 
-      {phase === 'retry' && <div className="fb fb-retry" role="status"><b>Thử lại nhé.</b> {msg}</div>}
-
-      {phase === 'feedback' && (
-        <div className={`fb ${finalCorrect ? 'fb-ok' : 'fb-bad'}`} role="status">
-          {finalCorrect ? (
+      <div className={`sheet sheet-${phase === 'feedback' ? (finalCorrect ? 'ok' : 'bad') : phase === 'retry' ? 'retry' : 'idle'}`}>
+        {phase === 'retry' && <div className="sheet-msg" role="status"><b>Thử lại nhé.</b> {msg}</div>}
+        {phase === 'feedback' && (
+          <div className="sheet-msg" role="status">
+            {finalCorrect ? (
+              <>
+                <b className="sheet-title">{tries > 0 ? 'Đúng rồi! Em đã tự sửa được.' : 'Chính xác! ⭐'}</b>
+                <p>{q.explanation}</p>
+              </>
+            ) : (
+              <>
+                <b className="sheet-title">{verdict?.dontKnow ? 'Mình cùng xem lời giải nhé.' : 'Chưa đúng, không sao cả.'}</b>
+                {msg && <p>{msg}</p>}
+                <p><b>Đáp án:</b> <span lang="en">{q.answers[0]}</span></p>
+                <p>{q.explanation}</p>
+                {q.audioText && <p lang="en">Bài nghe: {q.audioText}</p>}
+              </>
+            )}
+          </div>
+        )}
+        <div className="actions">
+          {phase !== 'feedback' && (
             <>
-              <b>{tries > 0 ? 'Đúng rồi! Em đã tự sửa được.' : 'Chính xác! ⭐'}</b>
-              <p>{q.explanation}</p>
-            </>
-          ) : (
-            <>
-              <b>{verdict?.dontKnow ? 'Mình cùng xem lời giải nhé.' : 'Chưa đúng, không sao cả.'}</b>
-              {msg && <p>{msg}</p>}
-              <p><b>Đáp án:</b> <span lang="en">{q.answers[0]}</span></p>
-              <p>{q.explanation}</p>
-              {q.audioText && <p className="muted" lang="en">Bài nghe: {q.audioText}</p>}
+              <button type="button" className="btn btn-primary" disabled={!ready} onClick={() => submit(currentAnswer())}>
+                {phase === 'retry' ? 'Kiểm tra lần nữa' : 'Kiểm tra'}
+              </button>
+              {hintAllowed && (
+                <button type="button" className="btn btn-soft" disabled={hintsShown >= q.hints.length} onClick={() => setHintsShown(hintsShown + 1)}>
+                  Gợi ý {hintsShown}/{q.hints.length}
+                </button>
+              )}
+              <button type="button" className="btn btn-link" onClick={() => submit('')}>Em chưa biết</button>
             </>
           )}
+          {phase === 'feedback' && (
+            <button type="button" className={`btn ${finalCorrect ? 'btn-primary' : 'btn-danger'}`} autoFocus
+              onClick={() => onNext({ skipped: false, firstTryCorrect: firstOk.current === true, firstTryClean, finalCorrect })}>{nextLabel}</button>
+          )}
         </div>
-      )}
-
-      <div className="actions">
-        {phase !== 'feedback' && (
-          <>
-            <button type="button" className="btn btn-primary" disabled={!ready} onClick={() => submit(currentAnswer())}>
-              {phase === 'retry' ? 'Kiểm tra lần nữa' : 'Kiểm tra'}
-            </button>
-            {hintAllowed && (
-              <button type="button" className="btn btn-soft" disabled={hintsShown >= q.hints.length} onClick={() => setHintsShown(hintsShown + 1)}>
-                Gợi ý {hintsShown}/{q.hints.length}
-              </button>
-            )}
-            <button type="button" className="btn btn-link" onClick={() => submit('')}>Em chưa biết</button>
-          </>
-        )}
-        {phase === 'feedback' && (
-          <button type="button" className="btn btn-primary" autoFocus
-            onClick={() => onNext({ skipped: false, firstTryCorrect: firstOk.current === true, firstTryClean, finalCorrect })}>{nextLabel}</button>
-        )}
       </div>
     </div>
   );

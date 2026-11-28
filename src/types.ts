@@ -149,6 +149,8 @@ export interface GameState {
   owned: string[];
   avatar: string;
   best: Record<string, number>;
+  /** Xu từ trò chơi đã nhận trong ngày (giới hạn để tránh chơi quá nhiều). */
+  dayCoins?: { day: string; coins: number };
   rewards: ParentReward[];
   redeemed: { id: string; name: string; cost: number; ts: number; done: boolean }[];
 }

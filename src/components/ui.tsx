@@ -44,6 +44,6 @@ export function speak(text: string, rate = 0.85): boolean {
 }
 
 /** Hình minh họa lớn (emoji) cho từ vựng, dùng chung cho bài học và trò chơi. */
-export function Picture({ emoji, size = 'md', label }: { emoji: string; size?: 'sm' | 'md' | 'lg'; label?: string }) {
+export function Picture({ emoji, size = 'md', label }: { emoji: string; size?: 'sm' | 'md' | 'lg' | 'xl'; label?: string }) {
   return <span className={`pic pic-${size}`} role="img" aria-label={label ?? 'hình minh họa'}>{emoji}</span>;
 }

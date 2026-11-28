@@ -1,4 +1,5 @@
 import { LESSONS } from '../data/lessons';
+import { GAME_DAILY_CAP } from '../logic/games';
 import { applyOutcome, newCard, outcomeOf, DAY_MS } from '../logic/srs';
 import type { AppData, Attempt, Context, GameState, ParentReward, UnitId, WeeklyResult } from '../types';
 
@@ -39,7 +40,7 @@ export type Action =
   | { type: 'read'; ms: number }
   | { type: 'nickname'; name: string }
   | { type: 'claim'; key: string; coins: number }
-  | { type: 'game-result'; game: string; score: number; coins: number }
+  | { type: 'game-result'; game: string; score: number; coins: number; day: string }
   | { type: 'buy'; itemId: string; cost: number }
   | { type: 'avatar'; id: string }
   | { type: 'rewards'; rewards: ParentReward[] }
@@ -112,7 +113,9 @@ export function reducer(state: AppData, action: Action): AppData {
       return { ...state, game: { ...state.game, claimed: [...state.game.claimed, action.key], bonus: state.game.bonus + action.coins } };
     case 'game-result': {
       const best = Math.max(state.game.best[action.game] ?? 0, action.score);
-      return { ...state, game: { ...state.game, gameCoins: state.game.gameCoins + Math.max(0, action.coins), best: { ...state.game.best, [action.game]: best } } };
+      const used = state.game.dayCoins?.day === action.day ? state.game.dayCoins.coins : 0;
+      const granted = Math.max(0, Math.min(action.coins, GAME_DAILY_CAP - used));
+      return { ...state, game: { ...state.game, gameCoins: state.game.gameCoins + granted, best: { ...state.game.best, [action.game]: best }, dayCoins: { day: action.day, coins: used + granted } } };
     }
     case 'buy':
       if (state.game.owned.includes(action.itemId)) return state;
