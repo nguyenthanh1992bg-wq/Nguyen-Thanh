@@ -44,3 +44,14 @@ export const PICTURE_WORDS: PictureWord[] = [
   { en: 'hat', vi: 'cái mũ', emoji: '🎩' }, { en: 'shoe', vi: 'chiếc giày', emoji: '👟' },
   { en: 'eye', vi: 'con mắt', emoji: '👁️' }, { en: 'hand', vi: 'bàn tay', emoji: '✋' },
 ];
+
+/** Hình minh họa (emoji) cho từ vựng của các bài học. */
+export const VOCAB_EMOJI: Record<string, string> = {
+  alphabet: '🔤', letter: '✉️', vowel: '🅰️', consonant: '🅱️', spell: '🔡',
+  student: '🧑‍🎓', teacher: '🧑‍🏫', friend: '🤝', classroom: '🏫', happy: '😀', tall: '🦒',
+  box: '📦', bus: '🚌', city: '🏙️', child: '🧒', toy: '🧸', watch: '⌚',
+  egg: '🥚', orange: '🍊', umbrella: '☂️', nurse: '🧑‍⚕️', moon: '🌙', artist: '🧑‍🎨',
+  tail: '🐕', notebook: '📓', phone: '📱', sister: '👧', house: '🏠', football: '⚽',
+  clock: '🕒', wall: '🧱', desk: '📚', library: '🏛️', park: '🏞️', garden: '🌷',
+  breakfast: '🍳', 'every day': '📅', usually: '🔁', brush: '🪥', cook: '👩‍🍳', Saturday: '🗓️',
+};

@@ -80,6 +80,8 @@ export interface Lesson {
   quiz: string[];
   remedial: { simpler: string[]; questionId: string };
   vocab: VocabItem[];
+  /** Video bài giảng do giáo viên cung cấp (liên kết ngoài, tùy chọn). */
+  video?: { title: string; url: string };
 }
 
 export type Context =
