@@ -5,7 +5,7 @@ import { badgeStates, BADGE_COINS, coinsOf, avatarOf } from '../logic/game';
 import { dayKey } from '../logic/daily';
 import { gameCoinsLeft, GAME_DAILY_CAP } from '../logic/games';
 import { Card, Note, fmtDate } from '../components/ui';
-import { DailyGoal, PlayerBar } from '../components/Rewards';
+import { DailyGoal, PlayerBar, WeeklyGoal } from '../components/Rewards';
 
 type Tab = 'games' | 'badges' | 'shop' | 'rewards';
 const TABS: { id: Tab; label: string }[] = [
@@ -37,6 +37,7 @@ export function Play({ initial }: { initial?: Tab }) {
       {tab === 'games' && (
         <>
           <Card><h2>Rương hôm nay</h2><DailyGoal /></Card>
+          <Card><h2>Rương tuần</h2><WeeklyGoal /></Card>
           <Note kind="info">Chơi game giúp nhớ từ vựng và kiếm xu. Mỗi ngày nhận tối đa <b>{GAME_DAILY_CAP} xu</b> từ trò chơi (hôm nay còn {left} xu), còn lại em kiếm bằng cách học bài.</Note>
           {GAMES.map((g) => (
             <Card key={g.id} className="gamecard">

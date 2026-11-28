@@ -4,6 +4,7 @@ import { buildReport, reportToText, type UnitLine } from '../logic/report';
 import { STATUS_LABEL } from '../logic/progress';
 import { Card, Note, ProgressBar, fmtDate } from '../components/ui';
 import { WEEKS, phaseOfWeek } from '../data/curriculum';
+import { dailyStats, dayComment, dayStars, recentWeeks, WEEK_GOAL_DAYS, WEEK_GOAL_QUESTIONS } from '../logic/daily';
 
 export function ParentReport() {
   const { data, go, now } = useApp();
@@ -32,6 +33,8 @@ export function ParentReport() {
       <h1>Báo cáo dành cho phụ huynh</h1>
       {r.demo && <Note kind="demo"><b>Dữ liệu minh họa</b> – không phải kết quả của học sinh thật.</Note>}
       <p className="muted small">Học sinh: <b>{r.nickname || 'chưa đặt tên'}</b> · Ngày lập báo cáo: {fmtDate(r.generatedAt)}{r.weekEstimate && <> · Khoảng tuần {r.weekEstimate.week}/12 kể từ khi bắt đầu (giai đoạn {r.weekEstimate.phase})</>}</p>
+
+      {new Date(t).getDate() >= 25 && <Note kind="warn"><b>Sắp hết tháng.</b> Xem <button className="btn btn-link" onClick={() => go({ name: 'quality' })}>đánh giá chất lượng tháng này</button> và gửi số liệu để nâng cấp ứng dụng.</Note>}
 
       {empty && <Note kind="info">Chưa có dữ liệu học tập. Báo cáo sẽ có số liệu sau khi học sinh làm bài kiểm tra đầu vào hoặc bài học đầu tiên.</Note>}
 
@@ -64,6 +67,26 @@ export function ParentReport() {
             <button className="btn btn-soft" onClick={() => go({ name: 'play', tab: 'rewards' })}>Quản lý phần thưởng</button>
           </>
         )}
+      </Card>
+
+      <Card>
+        <h2>Đánh giá theo ngày và tuần</h2>
+        {(() => {
+          const day = dailyStats(data.attempts, t).today;
+          const weeks = recentWeeks(data.attempts, t, 4);
+          return (
+            <>
+              <p><b>Hôm nay:</b> {'⭐'.repeat(dayStars(day))}{'☆'.repeat(3 - dayStars(day))} – {dayComment(day)}</p>
+              <div className="tablewrap"><table className="table">
+                <thead><tr><th>Tuần bắt đầu</th><th>Ngày học</th><th>Số câu</th><th>Đúng</th><th>Đánh giá</th></tr></thead>
+                <tbody>{[...weeks].reverse().map((w) => (
+                  <tr key={w.key}><td>{w.key.slice(8)}/{w.key.slice(5, 7)}</td><td>{w.daysActive}/{WEEK_GOAL_DAYS}</td><td>{w.answered}/{WEEK_GOAL_QUESTIONS}</td><td>{w.accuracy === null ? '–' : `${w.accuracy}%`}</td><td>{w.grade}</td></tr>
+                ))}</tbody>
+              </table></div>
+              <p className="small muted">Mục tiêu ngày: {day.answered}/{10} câu. Mục tiêu tuần: học {WEEK_GOAL_DAYS} ngày và làm {WEEK_GOAL_QUESTIONS} câu. Nhắc học: {data.settings.reminderOn ? `bật lúc ${data.settings.reminderTime}` : 'đang tắt'}.</p>
+            </>
+          );
+        })()}
       </Card>
 
       <Card>
@@ -112,6 +135,7 @@ export function ParentReport() {
 
       <div className="row">
         <button className="btn btn-primary" onClick={() => void copy()}>Sao chép báo cáo</button>
+        <button className="btn btn-soft" onClick={() => go({ name: 'quality' })}>Đánh giá chất lượng tháng</button>
         <button className="btn btn-soft" onClick={() => go({ name: 'content' })}>Quản lý nội dung</button>
         <button className="btn btn-link" onClick={() => go({ name: 'home' })}>Về trang chủ</button>
       </div>

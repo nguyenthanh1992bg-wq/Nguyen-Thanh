@@ -9,8 +9,11 @@ import { ContentManager } from './screens/ContentManager';
 import { WeeklyTest } from './screens/WeeklyTest';
 import { Play } from './screens/Play';
 import { Game } from './screens/Game';
+import { Quality } from './screens/Quality';
 import { avatarOf, coinsOf } from './logic/game';
 import { dailyStats } from './logic/daily';
+import { reminderState } from './logic/reminders';
+import { useReminderNotifier } from './components/Reminders';
 
 const TABS: { name: Route['name']; label: string; icon: string }[] = [
   { name: 'home', label: 'Trang chủ', icon: '🏠' },
@@ -24,8 +27,10 @@ const FULLSCREEN: Route['name'][] = ['placement', 'lesson', 'weekly', 'game'];
 
 export function App() {
   const { route, go, data } = useApp();
+  useReminderNotifier();
+  const rem = reminderState(data, Date.now());
   const full = FULLSCREEN.includes(route.name);
-  const activeTab: Route['name'] = route.name === 'content' ? 'report' : route.name;
+  const activeTab: Route['name'] = route.name === 'content' || route.name === 'quality' ? 'report' : route.name;
 
   let screen;
   switch (route.name) {
@@ -36,6 +41,7 @@ export function App() {
     case 'review': screen = <Review key={route.mode ?? 'hub'} initial={route.mode} />; break;
     case 'report': screen = <ParentReport />; break;
     case 'content': screen = <ContentManager />; break;
+    case 'quality': screen = <Quality />; break;
     case 'weekly': screen = <WeeklyTest key={route.week} week={route.week} />; break;
     case 'play': screen = <Play key={route.tab ?? 'games'} initial={route.tab} />; break;
     case 'game': screen = <Game key={route.id} id={route.id} />; break;
@@ -57,7 +63,7 @@ export function App() {
           {TABS.map((t) => (
             <button key={t.name} type="button" className={`tab ${activeTab === t.name ? 'tab-on' : ''}`}
               aria-current={activeTab === t.name ? 'page' : undefined} onClick={() => go({ name: t.name } as Route)}>
-              <span aria-hidden="true">{t.icon}</span><span>{t.label}</span>
+              <span aria-hidden="true" className="tab-icon">{t.icon}{((t.name === 'review' && rem.dueCount > 0) || (t.name === 'home' && rem.needStudy)) && <i className="dotbadge" aria-label="có nhắc" />}</span><span>{t.label}</span>
             </button>
           ))}
         </nav>

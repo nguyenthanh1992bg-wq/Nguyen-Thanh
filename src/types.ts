@@ -149,10 +149,19 @@ export interface GameState {
   owned: string[];
   avatar: string;
   best: Record<string, number>;
+  /** Số lần chơi mỗi trò (để đánh giá cân bằng giữa học và chơi). */
+  plays?: Record<string, number>;
   /** Xu từ trò chơi đã nhận trong ngày (giới hạn để tránh chơi quá nhiều). */
   dayCoins?: { day: string; coins: number };
   rewards: ParentReward[];
   redeemed: { id: string; name: string; cost: number; ts: number; done: boolean }[];
+}
+
+export interface Settings {
+  /** Nhắc học hằng ngày trong ứng dụng (và thông báo của trình duyệt nếu được phép). */
+  reminderOn: boolean;
+  /** Giờ nhắc, dạng HH:MM theo giờ thiết bị. */
+  reminderTime: string;
 }
 
 export interface AppData {
@@ -167,4 +176,5 @@ export interface AppData {
   /** Thời gian đọc bài giảng (ms), đã giới hạn từng lần ghi. */
   readMs: number;
   game: GameState;
+  settings: Settings;
 }

@@ -54,3 +54,23 @@ export function chestState(d: AppData, now: number): { reached: boolean; claimed
 }
 
 export const avatarOf = (d: AppData) => AVATARS.find((a) => a.id === d.game.avatar) ?? AVATARS[0];
+
+/* ===== Thưởng theo ngày và tuần ===== */
+import { dayStars, weekStat, type Stars } from './daily';
+
+export const chestCoinsFor = (stars: Stars): number => (stars >= 3 ? 30 : stars === 2 ? 20 : 0);
+export const WEEK_CHEST_COINS = 60;
+export const WEEK_EXCELLENT_BONUS = 20;
+export const weekChestKey = (now: number): string => `wchest:${weekStat([], now).key}`;
+
+export function weekChestState(d: AppData, now: number) {
+  const w = weekStat(d.attempts, now);
+  const key = weekChestKey(now);
+  return { week: w, key, reached: w.reached, claimed: d.game.claimed.includes(key), coins: WEEK_CHEST_COINS + (w.excellent ? WEEK_EXCELLENT_BONUS : 0) };
+}
+
+export function dayChest(d: AppData, now: number) {
+  const day = dailyStats(d.attempts, now).today;
+  const stars = dayStars(day);
+  return { stars, coins: chestCoinsFor(stars), key: chestKey(now), claimed: d.game.claimed.includes(chestKey(now)) };
+}

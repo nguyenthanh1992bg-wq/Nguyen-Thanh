@@ -1,6 +1,6 @@
 import { useApp } from '../state/AppContext';
-import { avatarOf, chestKey, chestState, levelOf, CHEST_COINS, coinsOf } from '../logic/game';
-import { dailyStats } from '../logic/daily';
+import { avatarOf, coinsOf, dayChest, levelOf, weekChestState } from '../logic/game';
+import { dailyStats, dayComment, WEEK_GOAL_DAYS, WEEK_GOAL_QUESTIONS } from '../logic/daily';
 import { ProgressBar } from './ui';
 
 /** Thanh nhân vật: avatar, cấp độ, xu, chuỗi ngày. Dùng ở Trang chủ và mục Chơi. */
@@ -25,16 +25,18 @@ export function PlayerBar() {
   );
 }
 
-/** Mục tiêu hôm nay và rương thưởng. */
+/** Mục tiêu hôm nay: đánh giá bằng sao và rương thưởng. */
 export function DailyGoal() {
   const { data, dispatch, now, go } = useApp();
   const t = now();
   const d = dailyStats(data.attempts, t);
-  const c = chestState(data, t);
+  const c = dayChest(data, t);
   return (
     <div>
-      <p><b>{d.today.answered}/{d.goal}</b> câu hôm nay · <b>{d.today.points}</b> điểm{d.today.accuracy !== null && <> · đúng {d.today.accuracy}%</>}</p>
+      <p className="stars" aria-label={`${c.stars} trên 3 sao hôm nay`}>{'⭐'.repeat(c.stars)}{'☆'.repeat(3 - c.stars)}</p>
+      <p><b>{d.today.answered}/{d.goal}</b> câu · <b>{d.today.points}</b> điểm{d.today.accuracy !== null && <> · đúng {d.today.accuracy}%</>}</p>
       <ProgressBar value={d.today.answered} max={d.goal} label="Mục tiêu hôm nay" />
+      <p className="small">{dayComment(d.today)}</p>
       <div className="week" role="img" aria-label="Số câu 7 ngày gần nhất">
         {d.last7.map((x, i) => (
           <div key={i} className="week-col">
@@ -44,9 +46,27 @@ export function DailyGoal() {
         ))}
       </div>
       {c.claimed ? <p className="chest">🎁 Hôm nay em đã mở rương rồi. Hẹn em ngày mai!</p>
-        : c.reached ? <button className="btn btn-primary btn-lg" onClick={() => dispatch({ type: 'claim', key: chestKey(t), coins: CHEST_COINS })}>🎁 Mở rương thưởng +{CHEST_COINS} xu</button>
-          : <p className="chest muted">🎁 Làm đủ {d.goal} câu để mở rương +{CHEST_COINS} xu. Còn {d.goal - d.today.answered} câu nữa!</p>}
+        : c.coins > 0 ? <button className="btn btn-primary btn-lg" onClick={() => dispatch({ type: 'claim', key: c.key, coins: c.coins })}>🎁 Mở rương hôm nay +{c.coins} xu</button>
+          : <p className="chest muted">🎁 Làm đủ {d.goal} câu để mở rương (+20 xu, đúng ≥ 85% được +30 xu). Còn {Math.max(0, d.goal - d.today.answered)} câu nữa!</p>}
       <p className="small"><button className="btn btn-link" onClick={() => go({ name: 'play' })}>Vào mục Chơi & phần thưởng →</button></p>
+    </div>
+  );
+}
+
+/** Mục tiêu tuần: số ngày học, số câu, đánh giá và rương tuần. */
+export function WeeklyGoal() {
+  const { data, dispatch, now } = useApp();
+  const w = weekChestState(data, now());
+  const s = w.week;
+  return (
+    <div>
+      <p><b>Đánh giá tuần này: {s.grade}</b></p>
+      <p className="small">📅 <b>{s.daysActive}/{WEEK_GOAL_DAYS}</b> ngày có học · ✏️ <b>{s.answered}/{WEEK_GOAL_QUESTIONS}</b> câu{s.accuracy !== null && <> · đúng {s.accuracy}%</>}</p>
+      <ProgressBar value={s.daysActive} max={WEEK_GOAL_DAYS} label="Số ngày học trong tuần" />
+      <ProgressBar value={s.answered} max={WEEK_GOAL_QUESTIONS} label="Số câu trong tuần" />
+      {w.claimed ? <p className="chest">🏆 Em đã nhận rương tuần này. Tuần mới bắt đầu vào thứ Hai!</p>
+        : w.reached ? <button className="btn btn-primary btn-lg" onClick={() => dispatch({ type: 'claim', key: w.key, coins: w.coins })}>🏆 Mở rương tuần +{w.coins} xu</button>
+          : <p className="chest muted">🏆 Học {WEEK_GOAL_DAYS} ngày và làm {WEEK_GOAL_QUESTIONS} câu trong tuần để mở rương tuần (+60 xu, đúng ≥ 85% được thêm +20).</p>}
     </div>
   );
 }

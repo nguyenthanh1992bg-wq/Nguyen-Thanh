@@ -119,3 +119,20 @@ class CloudStore implements DataStore {
     await c.col.doc('progress').set({ json: JSON.stringify({ ...emptyData(), attempts: [] }), chunks: 0, savedAt: Date.now() });
   }
 }
+
+/**
+ * Gửi số liệu đánh giá chất lượng (tổng hợp, ẩn danh) lên kho dùng chung `reports/<tháng>`
+ * để người phát triển đọc và nâng cấp ứng dụng. Chỉ chạy khi có tài khoản; không gửi tên hay hồ sơ học sinh.
+ */
+export async function publishQualityReport(month: string, payload: unknown): Promise<'ok' | 'unavailable' | 'error'> {
+  const rt = (window as unknown as { claude?: ClaudeRuntime }).claude;
+  if (!rt || typeof rt.use !== 'function') return 'unavailable';
+  try {
+    const db = await withTimeout(rt.use('db') as Promise<Db | null>, 10_000);
+    if (!db) return 'unavailable';
+    await db.collection('reports').doc(month).set({ json: JSON.stringify(payload), month, sentAt: Date.now() });
+    return 'ok';
+  } catch {
+    return 'error';
+  }
+}

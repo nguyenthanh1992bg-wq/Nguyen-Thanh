@@ -11,6 +11,7 @@ export type Route =
   | { name: 'review'; mode?: 'due' | 'mistakes' | 'vocab' }
   | { name: 'report' }
   | { name: 'content' }
+  | { name: 'quality' }
   | { name: 'weekly'; week: number }
   | { name: 'play'; tab?: 'games' | 'badges' | 'shop' | 'rewards' }
   | { name: 'game'; id: string };
@@ -24,6 +25,7 @@ export function parseHash(hash: string): Route {
     case 'review': return { name: 'review', mode: parts[1] === 'due' || parts[1] === 'mistakes' || parts[1] === 'vocab' ? parts[1] : undefined };
     case 'report': return { name: 'report' };
     case 'content': return { name: 'content' };
+    case 'quality': return { name: 'quality' };
     case 'weekly': return Number(parts[1]) >= 2 && Number(parts[1]) <= 12 ? { name: 'weekly', week: Number(parts[1]) } : { name: 'roadmap' };
     case 'play': return { name: 'play', tab: parts[1] === 'badges' || parts[1] === 'shop' || parts[1] === 'rewards' ? parts[1] : undefined };
     case 'game': return parts[1] ? { name: 'game', id: parts[1] } : { name: 'play' };

@@ -425,3 +425,177 @@ describe('phần thưởng', () => {
     expect(ids).not.toContain('streak7');
   });
 });
+
+import { dayStars, weekStat, weekStart, recentWeeks, WEEK_GOAL_DAYS, WEEK_GOAL_QUESTIONS } from './daily';
+import { chestCoinsFor, weekChestState, dayChest, WEEK_CHEST_COINS, WEEK_EXCELLENT_BONUS } from './game';
+import { reminderState, shouldNotify, googleCalendarUrl, icsContent, nextOccurrence, minutesOf } from './reminders';
+
+// Thứ Tư 21/10/2026 12:00 (giữa tuần, tránh biên múi giờ)
+const WED = new Date(2026, 9, 21, 20, 0, 0).getTime();
+
+describe('đánh giá theo ngày', () => {
+  const mk = (answered: number, accuracy: number | null) => ({ key: 'k', label: 'T2', answered, points: 0, accuracy });
+  it('sao: <nửa mục tiêu=0, nửa=1, đủ=2, đủ và đúng ≥85%=3', () => {
+    expect(dayStars(mk(0, null))).toBe(0);
+    expect(dayStars(mk(4, 100))).toBe(0);
+    expect(dayStars(mk(5, 50))).toBe(1);
+    expect(dayStars(mk(10, 70))).toBe(2);
+    expect(dayStars(mk(10, 85))).toBe(3);
+    expect(chestCoinsFor(1)).toBe(0);
+    expect(chestCoinsFor(2)).toBe(20);
+    expect(chestCoinsFor(3)).toBe(30);
+  });
+  it('rương ngày: số xu theo sao thực tế từ lịch sử làm bài', () => {
+    let s = emptyData();
+    for (let i = 0; i < 10; i++) s = sim(s, 'ls-tobe-p1', true, WED + i, 'practice');
+    expect(dayChest(s, WED + 100)).toMatchObject({ stars: 3, coins: 30, claimed: false });
+    let t = emptyData();
+    for (let i = 0; i < 10; i++) t = sim(t, 'ls-tobe-p1', i < 7, WED + i, 'practice');
+    expect(dayChest(t, WED + 100)).toMatchObject({ stars: 2, coins: 20 });
+  });
+});
+
+describe('đánh giá và thưởng theo tuần', () => {
+  const studyDays = (days: number[], perDay: number, ok = true) => {
+    let s = emptyData();
+    for (const d of days) for (let i = 0; i < perDay; i++) s = sim(s, 'ls-tobe-p1', ok, weekStart(WED) + d * DAY_MS + i * 1000, 'practice');
+    return s;
+  };
+  it('tuần bắt đầu từ thứ Hai và gom đúng các ngày trong tuần', () => {
+    const ws = weekStart(WED);
+    expect(new Date(ws).getDay()).toBe(1);
+    const s = studyDays([0, 2], 5);
+    const w = weekStat(s.attempts, WED);
+    expect(w.daysActive).toBe(2);
+    expect(w.answered).toBe(10);
+    expect(weekStat(s.attempts, WED + 7 * DAY_MS).answered).toBe(0); // tuần sau
+  });
+  it('đạt mục tiêu tuần: 5 ngày và 50 câu; đúng ≥ 85% là xuất sắc kèm thưởng thêm', () => {
+    const s = studyDays([0, 1, 2, 3, 4], WEEK_GOAL_QUESTIONS / WEEK_GOAL_DAYS);
+    const c = weekChestState(s, WED);
+    expect(c.week.grade).toBe('Xuất sắc');
+    expect(c.reached).toBe(true);
+    expect(c.coins).toBe(WEEK_CHEST_COINS + WEEK_EXCELLENT_BONUS);
+    const mid = studyDays([0, 1, 2, 3, 4], 10);
+    const m = weekStat(mid.attempts, WED);
+    expect(m.reached).toBe(true);
+    const low = studyDays([0, 1, 2, 3, 4], 10, false);
+    const l = weekChestState(low, WED);
+    expect(l.reached).toBe(true);
+    expect(l.week.grade).toBe('Tốt');
+    expect(l.coins).toBe(WEEK_CHEST_COINS);
+  });
+  it('chưa đủ mục tiêu: không mở được rương; đánh giá theo số ngày', () => {
+    expect(weekChestState(studyDays([0, 1, 2], 5), WED).reached).toBe(false);
+    expect(weekStat(studyDays([0, 1, 2], 5).attempts, WED).grade).toBe('Khá');
+    expect(weekStat(studyDays([0], 5).attempts, WED).grade).toBe('Cần cố gắng hơn');
+    expect(weekStat([], WED).grade).toBe('Chưa học');
+  });
+  it('nhận rương tuần chỉ một lần', () => {
+    let s = studyDays([0, 1, 2, 3, 4], 10);
+    const c = weekChestState(s, WED);
+    s = reducer(s, { type: 'claim', key: c.key, coins: c.coins });
+    s = reducer(s, { type: 'claim', key: c.key, coins: c.coins });
+    expect(s.game.bonus).toBe(c.coins);
+    expect(weekChestState(s, WED).claimed).toBe(true);
+    expect(recentWeeks(s.attempts, WED, 4)).toHaveLength(4);
+  });
+});
+
+describe('nhắc học và ôn tập', () => {
+  it('nhắc khi quá giờ mà chưa học; không nhắc khi đã học hoặc tắt nhắc', () => {
+    let s = emptyData();
+    const early = new Date(2026, 9, 21, 9, 0).getTime();
+    const late = new Date(2026, 9, 21, 20, 0).getTime();
+    expect(reminderState(s, early).needStudy).toBe(false); // chưa tới 19:00
+    expect(reminderState(s, late).needStudy).toBe(true);
+    expect(reminderState(s, late).message).toMatch(/Đến giờ học/);
+    s = sim(s, 'ls-tobe-p1', true, late - 1000, 'practice');
+    expect(reminderState(s, late).needStudy).toBe(false);
+    const off = reducer(emptyData(), { type: 'settings', settings: { reminderOn: false } });
+    expect(reminderState(off, late).needStudy).toBe(false);
+  });
+  it('nhắc ôn khi có nội dung đến hạn', () => {
+    let s = simulatePlacement(emptyData(), WED, () => false);
+    s = simulateLesson(s, 'lesson-alphabet', WED, 3);
+    const r = reminderState(s, WED + 3 * DAY_MS);
+    expect(r.dueCount).toBeGreaterThan(0);
+    expect(r.message).toMatch(/đến hạn ôn/);
+  });
+  it('thông báo trình duyệt chỉ một lần mỗi ngày', () => {
+    const late = new Date(2026, 9, 21, 20, 0).getTime();
+    const s = emptyData();
+    expect(shouldNotify(s, late, null)).toBe(true);
+    expect(shouldNotify(s, late, dayKey(late))).toBe(false);
+    expect(shouldNotify(s, late, dayKey(late - DAY_MS))).toBe(true);
+  });
+  it('lịch nhắc: lần kế tiếp đúng giờ; liên kết Google Calendar và .ics lặp hằng ngày', () => {
+    const now = new Date(2026, 9, 21, 20, 0).getTime();
+    const n = nextOccurrence('19:00', now);
+    expect(n.getDate()).toBe(22);
+    expect(n.getHours()).toBe(19);
+    expect(nextOccurrence('21:30', now).getDate()).toBe(21);
+    expect(minutesOf('07:05')).toBe(7 * 60 + 5);
+    const url = googleCalendarUrl('19:00', now);
+    expect(url.startsWith('https://calendar.google.com/calendar/render?')).toBe(true);
+    expect(decodeURIComponent(url)).toContain('RRULE:FREQ=DAILY');
+    const ics = icsContent('19:00', now);
+    expect(ics).toContain('BEGIN:VALARM');
+    expect(ics).toContain('RRULE:FREQ=DAILY');
+    expect(ics).toContain('DTSTART:20261022T190000');
+  });
+});
+
+import { buildQualityReport, qualityToText, monthKey } from './quality';
+
+describe('đánh giá chất lượng ứng dụng theo tháng', () => {
+  it('chưa có dữ liệu: không kết luận bừa, nêu rõ cần làm đầu vào và chưa đủ dữ liệu', () => {
+    const r = buildQualityReport(emptyData(), WED);
+    expect(r.sample.enoughData).toBe(false);
+    expect(r.strengths).toHaveLength(0);
+    expect(r.improvements.some((x) => x.area === 'Kiểm tra đầu vào' && x.severity === 'high')).toBe(true);
+    expect(r.improvements.some((x) => x.area === 'Dữ liệu')).toBe(true);
+    expect(monthKey(WED)).toBe('2026-10');
+  });
+  it('học sinh học theo lộ trình: ghi nhận hiệu quả lộ trình (điểm tốt) và nhóm thiếu bài (cần cải thiện)', () => {
+    let s = simulatePlacement(emptyData(), WED - 20 * DAY_MS, () => false);
+    // học và đạt 3 bài nền, mỗi bài làm đúng nhiều lần trong nhiều ngày
+    ['lesson-alphabet', 'lesson-tobe', 'lesson-plural'].forEach((id, i) => { s = simulateLesson(s, id, WED - (15 - i * 3) * DAY_MS, 3); });
+    for (let d = 0; d < 8; d++) for (const q of ['ls-tobe-q1', 'ls-plural-q1', 'ls-alpha-q1', 'ls-tobe-q2']) s = sim(s, q, true, WED - d * DAY_MS, 'review');
+    const r = buildQualityReport(s, WED);
+    expect(r.sample.enoughData).toBe(true);
+    expect(r.pathEffect.length).toBeGreaterThanOrEqual(2);
+    expect(r.strengths.some((x) => x.area === 'Hiệu quả lộ trình')).toBe(true);
+    expect(r.strengths.some((x) => x.area === 'Ghi nhớ')).toBe(true);
+    expect(r.coverageGaps.length).toBeGreaterThan(0);
+    const gap = r.improvements.find((x) => x.area === 'Nội dung bài học');
+    expect(gap?.severity).toBe('high');
+    expect(gap?.action).toBeTruthy();
+    expect(r.improvements[0].severity).toBe('high'); // vấn đề nặng nhất đứng đầu
+  });
+  it('phát hiện câu hỏi quá khó và đáp án bẫy', () => {
+    let s = emptyData();
+    for (let i = 0; i < 5; i++) s = sim(s, 'ls-tobe-p1', false, WED + i, 'practice', { answer: 'am' });
+    const r = buildQualityReport(s, WED + 1000);
+    expect(r.questionFlags.map((f) => f.kind)).toEqual(expect.arrayContaining(['too-hard', 'trap']));
+    expect(r.improvements.some((x) => x.area === 'Ngân hàng câu hỏi')).toBe(true);
+  });
+  it('nhận định về gợi ý/thử lại, thói quen học thưa, chơi game nhiều hơn học', () => {
+    let s = emptyData();
+    for (let i = 0; i < 6; i++) { s = sim(s, 'ls-tobe-p1', false, WED + i, 'practice'); s = sim(s, 'ls-tobe-p1', true, WED + i + 1, 'practice', { retry: true, hints: 1 }); }
+    for (let i = 0; i < 30; i++) s = sim(s, 'ls-tobe-q1', true, WED + 100 + i - (i % 6) * DAY_MS, 'quiz'); // trải trên 6 ngày
+    s = { ...s, game: { ...s.game, plays: { picture: 12, speed: 8 } } };
+    const r = buildQualityReport(s, WED + 1000);
+    expect(r.habitsAndUx.retryFixRate).toBe(100);
+    expect(r.strengths.some((x) => x.area === 'Cơ chế sai → gợi ý → thử lại')).toBe(true);
+    expect(r.improvements.some((x) => x.area === 'Cân bằng học – chơi')).toBe(true);
+  });
+  it('báo cáo văn bản có đủ hai phần và kế hoạch nâng cấp; payload ẩn danh không chứa tên', () => {
+    const d = { ...makeDemoData(WED), nickname: 'Tên-Riêng-Tư' };
+    const r = buildQualityReport(d, WED);
+    const txt = qualityToText(r);
+    expect(txt).toMatch(/GIỮ VÀ PHÁT HUY/);
+    expect(txt).toMatch(/KẾ HOẠCH NÂNG CẤP/);
+    expect(JSON.stringify(r)).not.toContain('Tên-Riêng-Tư');
+  });
+});

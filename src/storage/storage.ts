@@ -1,5 +1,5 @@
 import type { AppData } from '../types';
-import { emptyData, emptyGame } from '../state/reducer';
+import { emptyData, emptyGame, emptySettings } from '../state/reducer';
 
 /**
  * Lớp lưu trữ có thể thay bằng cơ sở dữ liệu thật (API + DB) mà không phải sửa giao diện.
@@ -24,7 +24,7 @@ export function isAppData(x: unknown): x is AppData {
 
 /** Điền các trường mới cho dữ liệu cũ (ví dụ chưa có `game`). */
 export function normalizeData(d: AppData): AppData {
-  return { ...emptyData(), ...d, game: { ...emptyGame(), ...(d.game ?? {}) } };
+  return { ...emptyData(), ...d, game: { ...emptyGame(), ...(d.game ?? {}) }, settings: { ...emptySettings(), ...(d.settings ?? {}) } };
 }
 
 export class LocalStorageStore implements DataStore {

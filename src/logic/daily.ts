@@ -51,3 +51,66 @@ export function dailyStats(attempts: Attempt[], now: number): DailyStats {
     totalPoints: attempts.filter(isStudy).reduce((s, a) => s + weight(a) * POINTS_PER_CORRECT, 0),
   };
 }
+
+/* ===== Đánh giá theo ngày và theo tuần ===== */
+
+export type Stars = 0 | 1 | 2 | 3;
+
+/** Sao trong ngày: 1 = đã làm ít nhất nửa mục tiêu, 2 = đủ mục tiêu, 3 = đủ mục tiêu và đúng ≥ 85%. */
+export function dayStars(d: DayStat, goal = DAILY_GOAL): Stars {
+  if (d.answered >= goal && (d.accuracy ?? 0) >= 85) return 3;
+  if (d.answered >= goal) return 2;
+  if (d.answered >= Math.ceil(goal / 2)) return 1;
+  return 0;
+}
+
+export function dayComment(d: DayStat, goal = DAILY_GOAL): string {
+  const s = dayStars(d, goal);
+  if (s === 3) return 'Xuất sắc! Em đủ mục tiêu và làm rất chính xác.';
+  if (s === 2) return 'Tốt lắm! Em đã đủ mục tiêu hôm nay. Lần sau thử làm chính xác hơn để được 3 sao.';
+  if (s === 1) return `Gần đạt rồi! Làm thêm ${goal - d.answered} câu nữa là đủ mục tiêu.`;
+  return d.answered === 0 ? 'Hôm nay em chưa học. Chỉ cần 10–15 phút thôi nhé!' : `Mới làm ${d.answered} câu. Cố lên nào!`;
+}
+
+export const WEEK_GOAL_DAYS = 5;
+export const WEEK_GOAL_QUESTIONS = 50;
+
+export interface WeekStat {
+  /** Khóa tuần = ngày thứ Hai (theo giờ thiết bị). */
+  key: string;
+  startTs: number;
+  daysActive: number;
+  answered: number;
+  points: number;
+  accuracy: number | null;
+  reached: boolean;
+  /** Thưởng thêm khi đúng ≥ 85%. */
+  excellent: boolean;
+  grade: 'Xuất sắc' | 'Tốt' | 'Khá' | 'Cần cố gắng hơn' | 'Chưa học';
+}
+
+export function weekStart(ts: number): number {
+  const d = new Date(ts);
+  d.setHours(12, 0, 0, 0);
+  const dow = (d.getDay() + 6) % 7; // thứ Hai = 0
+  return d.getTime() - dow * DAY_MS;
+}
+
+export function weekStat(attempts: Attempt[], ts: number): WeekStat {
+  const start = weekStart(ts);
+  const keys = new Set(Array.from({ length: 7 }, (_, i) => dayKey(start + i * DAY_MS)));
+  const as = attempts.filter((a) => isStudy(a) && keys.has(dayKey(a.ts)));
+  const days = new Set(as.map((a) => dayKey(a.ts))).size;
+  const acc = as.length === 0 ? null : Math.round((as.reduce((s, a) => s + weight(a), 0) / as.length) * 100);
+  const reached = days >= WEEK_GOAL_DAYS && as.length >= WEEK_GOAL_QUESTIONS;
+  const excellent = reached && (acc ?? 0) >= 85;
+  const grade: WeekStat['grade'] = as.length === 0 ? 'Chưa học' : excellent ? 'Xuất sắc' : reached ? 'Tốt' : days >= 3 ? 'Khá' : 'Cần cố gắng hơn';
+  return {
+    key: dayKey(start), startTs: start, daysActive: days, answered: as.length, accuracy: acc, reached, excellent, grade,
+    points: Math.round(as.reduce((s, a) => s + weight(a) * POINTS_PER_CORRECT, 0)),
+  };
+}
+
+/** Các tuần gần nhất, tuần mới nhất ở cuối. */
+export const recentWeeks = (attempts: Attempt[], now: number, n = 4): WeekStat[] =>
+  Array.from({ length: n }, (_, i) => n - 1 - i).map((off) => weekStat(attempts, now - off * 7 * DAY_MS));

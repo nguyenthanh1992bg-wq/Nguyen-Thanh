@@ -1,7 +1,7 @@
 import { LESSONS } from '../data/lessons';
 import { GAME_DAILY_CAP } from '../logic/games';
 import { applyOutcome, newCard, outcomeOf, DAY_MS } from '../logic/srs';
-import type { AppData, Attempt, Context, GameState, ParentReward, UnitId, WeeklyResult } from '../types';
+import type { AppData, Attempt, Context, GameState, ParentReward, Settings, UnitId, WeeklyResult } from '../types';
 
 export const DEFAULT_REWARDS: ParentReward[] = [
   { id: 'r-ice', name: 'Một cây kem', cost: 150 },
@@ -14,6 +14,8 @@ export const emptyGame = (): GameState => ({
   best: {}, rewards: DEFAULT_REWARDS, redeemed: [],
 });
 
+export const emptySettings = (): Settings => ({ reminderOn: true, reminderTime: '19:00' });
+
 export const emptyData = (): AppData => ({
   version: 1,
   demo: false,
@@ -25,6 +27,7 @@ export const emptyData = (): AppData => ({
   weeklyTests: {},
   readMs: 0,
   game: emptyGame(),
+  settings: emptySettings(),
 });
 
 /** Chỉ các hoạt động học/ôn mới đưa câu hỏi vào lịch ôn cách quãng. Bài đầu vào chỉ là đo lường. */
@@ -39,6 +42,7 @@ export type Action =
   | { type: 'weekly'; week: number; result: WeeklyResult }
   | { type: 'read'; ms: number }
   | { type: 'nickname'; name: string }
+  | { type: 'settings'; settings: Partial<Settings> }
   | { type: 'claim'; key: string; coins: number }
   | { type: 'game-result'; game: string; score: number; coins: number; day: string }
   | { type: 'buy'; itemId: string; cost: number }
@@ -108,6 +112,8 @@ export function reducer(state: AppData, action: Action): AppData {
       return { ...state, readMs: state.readMs + Math.min(Math.max(action.ms, 0), 5 * 60_000) };
     case 'nickname':
       return { ...state, nickname: action.name.slice(0, 30) };
+    case 'settings':
+      return { ...state, settings: { ...state.settings, ...action.settings } };
     case 'claim':
       if (state.game.claimed.includes(action.key)) return state;
       return { ...state, game: { ...state.game, claimed: [...state.game.claimed, action.key], bonus: state.game.bonus + action.coins } };
@@ -115,7 +121,7 @@ export function reducer(state: AppData, action: Action): AppData {
       const best = Math.max(state.game.best[action.game] ?? 0, action.score);
       const used = state.game.dayCoins?.day === action.day ? state.game.dayCoins.coins : 0;
       const granted = Math.max(0, Math.min(action.coins, GAME_DAILY_CAP - used));
-      return { ...state, game: { ...state.game, gameCoins: state.game.gameCoins + granted, best: { ...state.game.best, [action.game]: best }, dayCoins: { day: action.day, coins: used + granted } } };
+      return { ...state, game: { ...state.game, gameCoins: state.game.gameCoins + granted, best: { ...state.game.best, [action.game]: best }, plays: { ...(state.game.plays ?? {}), [action.game]: (state.game.plays?.[action.game] ?? 0) + 1 }, dayCoins: { day: action.day, coins: used + granted } } };
     }
     case 'buy':
       if (state.game.owned.includes(action.itemId)) return state;
@@ -129,7 +135,7 @@ export function reducer(state: AppData, action: Action): AppData {
     case 'redeem-done':
       return { ...state, game: { ...state.game, redeemed: state.game.redeemed.map((r) => (r.ts === action.ts ? { ...r, done: true } : r)) } };
     case 'replace':
-      return { ...emptyData(), ...action.data, game: { ...emptyGame(), ...(action.data.game ?? {}) } };
+      return { ...emptyData(), ...action.data, game: { ...emptyGame(), ...(action.data.game ?? {}) }, settings: { ...emptySettings(), ...(action.data.settings ?? {}) } };
     case 'reset':
       return emptyData();
   }

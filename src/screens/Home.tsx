@@ -7,8 +7,9 @@ import { mistakeLog, unitStatus } from '../logic/progress';
 import { dueCards } from '../logic/srs';
 import { makeDemoData } from '../state/simulate';
 import { Card, Note, ProgressBar } from '../components/ui';
-import { DailyGoal, PlayerBar } from '../components/Rewards';
+import { DailyGoal, PlayerBar, WeeklyGoal } from '../components/Rewards';
 import { LearningPath } from '../components/LearningPath';
+import { ReminderBanner, ReminderSettings } from '../components/Reminders';
 
 export function Home() {
   const { data, dispatch, go, now, reset, syncState } = useApp();
@@ -36,6 +37,8 @@ export function Home() {
   return (
     <div className="stack">
       {data.demo && <Note kind="demo"><b>Đang xem hồ sơ minh họa.</b> Đây không phải dữ liệu của em. Bấm “Xóa dữ liệu” ở cuối trang để bắt đầu thật.</Note>}
+
+      <ReminderBanner />
 
       <Card><PlayerBar /></Card>
 
@@ -82,6 +85,11 @@ export function Home() {
       </Card>
 
       <Card>
+        <h2>Mục tiêu tuần</h2>
+        <WeeklyGoal />
+      </Card>
+
+      <Card>
         <h2>Tiến độ học</h2>
         <p><b>{passed}</b>/{LESSONS.length} bài đã hoàn thành <span className="muted">(bản thử nghiệm có {LESSONS.length} bài mẫu)</span></p>
         <ProgressBar value={passed} max={LESSONS.length} label="Số bài hoàn thành" />
@@ -98,6 +106,11 @@ export function Home() {
           {weakUnits.length > 0 && <li>🌱 Đang cần luyện thêm: {weakUnits.map((u) => getUnit(u.id).name).join('; ')}{weakUnits.some((u) => lessonByUnit(u.id)) ? '' : ' (chưa có bài trong bản thử nghiệm)'}</li>}
         </ul>
         <button className="btn btn-soft" onClick={() => go({ name: 'review' })}>Mở trang ôn tập</button>
+      </Card>
+
+      <Card>
+        <h2>⏰ Nhắc học & ôn tập</h2>
+        <ReminderSettings />
       </Card>
 
       <Card className="muted-card">
