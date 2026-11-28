@@ -130,6 +130,27 @@ export interface WeeklyResult {
   weakUnits: UnitId[];
 }
 
+export interface ParentReward {
+  id: string;
+  name: string;
+  cost: number;
+}
+
+export interface GameState {
+  /** Các mốc thưởng đã nhận (rương ngày, huy hiệu) để không nhận hai lần. */
+  claimed: string[];
+  /** Xu thưởng từ rương/huy hiệu. */
+  bonus: number;
+  /** Xu kiếm được từ trò chơi nhỏ. */
+  gameCoins: number;
+  spent: number;
+  owned: string[];
+  avatar: string;
+  best: Record<string, number>;
+  rewards: ParentReward[];
+  redeemed: { id: string; name: string; cost: number; ts: number; done: boolean }[];
+}
+
 export interface AppData {
   version: 1;
   demo: boolean;
@@ -141,4 +162,5 @@ export interface AppData {
   weeklyTests: Record<string, WeeklyResult[]>;
   /** Thời gian đọc bài giảng (ms), đã giới hạn từng lần ghi. */
   readMs: number;
+  game: GameState;
 }
