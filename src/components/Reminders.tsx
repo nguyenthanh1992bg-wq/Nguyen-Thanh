@@ -50,6 +50,7 @@ export function useReminderNotifier(): void {
 export function ReminderSettings() {
   const { data, dispatch, now } = useApp();
   const s = data.settings;
+  const inArtifact = typeof window !== 'undefined' && 'claude' in window; // khung Artifact chặn tải tệp
   const [perm, setPerm] = useState<string>(typeof Notification === 'undefined' ? 'unsupported' : Notification.permission);
 
   async function ask() {
@@ -86,7 +87,7 @@ export function ReminderSettings() {
       <p className="small muted">Cách đáng tin cậy nhất là thêm lịch nhắc lặp hằng ngày vào lịch của điện thoại (ứng dụng web không tự báo được khi đã đóng).</p>
       <div className="row">
         <a className="btn btn-soft" href={googleCalendarUrl(s.reminderTime, now())} target="_blank" rel="noopener noreferrer">📅 Thêm vào Google Calendar</a>
-        <button type="button" className="btn btn-soft" onClick={downloadIcs}>⬇ Tải tệp lịch (.ics)</button>
+        {!inArtifact && <button type="button" className="btn btn-soft" onClick={downloadIcs}>⬇ Tải tệp lịch (.ics)</button>}
       </div>
     </div>
   );
